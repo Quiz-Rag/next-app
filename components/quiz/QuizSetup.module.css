@@ -1,0 +1,215 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.titleIcon {
+  color: var(--accent-primary);
+  filter: drop-shadow(0 0 10px var(--glow-primary));
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 1.125rem;
+}
+
+.chatContainer {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+}
+
+.messageGroup {
+  margin-bottom: 2rem;
+}
+
+.messageGroup:last-child {
+  margin-bottom: 0;
+}
+
+.botMessage,
+.userMessage {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.userMessage {
+  justify-content: flex-end;
+}
+
+.botAvatar,
+.userAvatar {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.bubble {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  border-radius: 1rem;
+  padding: 0.75rem 1rem;
+  max-width: 70%;
+  color: var(--text-primary);
+}
+
+.userMessage .bubble {
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  border: none;
+  color: white;
+}
+
+.optionsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-left: 3rem;
+}
+
+.optionCard {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  text-align: left;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.optionCard:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 20px var(--glow-primary);
+  transform: translateY(-2px);
+}
+
+.optionTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.optionDesc {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.optionsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-left: 3rem;
+}
+
+.optionPill {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  border-radius: 2rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.optionPill:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 15px var(--glow-primary);
+  transform: translateY(-2px);
+}
+
+.optionPill.easy {
+  border-color: var(--accent-success);
+}
+
+.optionPill.easy:hover {
+  border-color: var(--accent-success);
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+}
+
+.optionPill.medium {
+  border-color: var(--accent-warning);
+}
+
+.optionPill.medium:hover {
+  border-color: var(--accent-warning);
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
+}
+
+.optionPill.hard {
+  border-color: var(--accent-danger);
+}
+
+.optionPill.hard:hover {
+  border-color: var(--accent-danger);
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+}
+
+.startButton {
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  border: none;
+  border-radius: 0.75rem;
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem auto 0;
+  box-shadow: 0 10px 15px -3px rgba(0, 217, 255, 0.3);
+  transition: all 0.2s ease;
+}
+
+.startButton:hover {
+  box-shadow: 0 15px 25px -5px rgba(0, 217, 255, 0.4);
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 2rem;
+  }
+
+  .chatContainer {
+    padding: 1.5rem;
+  }
+
+  .optionsGrid {
+    grid-template-columns: 1fr;
+    margin-left: 0;
+  }
+
+  .optionsRow {
+    margin-left: 0;
+  }
+
+  .bubble {
+    max-width: 85%;
+  }
+}
