@@ -1,5 +1,5 @@
 'use client';
-
+import questionBank from '@/data/quiz-questions.json';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import QuizSetup from '@/components/quiz/QuizSetup';
@@ -25,22 +25,54 @@ export default function QuizPage() {
   const [answers, setAnswers] = useState([]);
   const [results, setResults] = useState(null);
 
+  function shuffle(array) {
+  const a = array.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
   const handleStartQuiz = (quizConfig) => {
     setConfig(quizConfig);
     setStage(STAGES.LOADING);
 
-    // Simulate quiz generation
     setTimeout(() => {
-      const generatedQuestions = generateQuiz(
-        quizConfig.topic,
-        quizConfig.difficulty,
-        quizConfig.questionCount
-      );
+      let generatedQuestions = [];
+
+      if (quizConfig.mode === 'random') {
+        // Build a flat pool of all questions from all topics/difficulties
+        // questionBank structure: { "topic": { "easy":[...], "medium":[...], ... }, ... }
+        const flatPool = Object.values(questionBank)
+          .map(topicObj => Object.values(topicObj).flat())
+          .flat();
+
+        // shuffle and take requested number
+        generatedQuestions = shuffle(flatPool).slice(0, quizConfig.questionCount);
+      } else {
+        // topic mode: use existing helper to filter by topic/difficulty
+        generatedQuestions = generateQuiz(
+          quizConfig.topic,
+          quizConfig.difficulty,
+          quizConfig.questionCount
+        );
+      }
+
+      // if nothing found, return user to setup (or handle as you prefer)
+      if (!generatedQuestions || generatedQuestions.length === 0) {
+        console.warn('No questions available for selection:', quizConfig);
+        // go back to setup so user can pick different options
+        setStage(STAGES.SETUP);
+        return;
+      }
+
       setQuestions(generatedQuestions);
       setAnswers(new Array(generatedQuestions.length).fill(null));
       setStage(STAGES.PLAYING);
-    }, 2000);
+    }, 2000); // shorten/lengthen delay as desired
   };
+  
 
   const handleSubmitQuiz = (userAnswers) => {
     setAnswers(userAnswers);

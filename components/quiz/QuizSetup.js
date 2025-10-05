@@ -7,6 +7,7 @@ import { getTopics, getDifficulties } from '@/lib/quizData';
 import styles from './QuizSetup.module.css';
 
 const STEPS = {
+  MODE: 'mode',
   TOPIC: 'topic',
   DIFFICULTY: 'difficulty',
   COUNT: 'count',
@@ -14,8 +15,9 @@ const STEPS = {
 };
 
 export default function QuizSetup({ onStart }) {
-  const [step, setStep] = useState(STEPS.TOPIC);
+  const [step, setStep] = useState(STEPS.MODE);
   const [config, setConfig] = useState({
+    mode: null,
     topic: null,
     difficulty: null,
     questionCount: 5,
@@ -23,6 +25,18 @@ export default function QuizSetup({ onStart }) {
 
   const topics = getTopics();
   const difficulties = getDifficulties();
+
+  // Mode selection
+  const handleModeSelect = (mode) => {
+    setConfig({ ...config, mode });
+    if (mode === 'random') {
+      // Jump directly to count step
+      setTimeout(() => setStep(STEPS.COUNT), 300);
+    } else {
+      // Continue to topic selection
+      setTimeout(() => setStep(STEPS.TOPIC), 300);
+    }
+  };
 
   const handleTopicSelect = (topicId) => {
     setConfig({ ...config, topic: topicId });
@@ -56,29 +70,46 @@ export default function QuizSetup({ onStart }) {
       </div>
 
       <div className={styles.chatContainer}>
-        {/* Topic Selection */}
-        <div className={styles.messageGroup}>
-          <div className={styles.botMessage}>
-            <span className={styles.botAvatar}>🤖</span>
-            <div className={styles.bubble}>
-              What topic would you like to be quizzed on?
-            </div>
-          </div>
-
-          {step !== STEPS.TOPIC && config.topic && (
-            <motion.div
-              className={styles.userMessage}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-            >
+        {/* Step 1: Mode Selection */}
+        {step === STEPS.MODE && (
+          <div className={styles.messageGroup}>
+            <div className={styles.botMessage}>
+              <span className={styles.botAvatar}>🤖</span>
               <div className={styles.bubble}>
-                {selectedTopic?.name || config.topic}
+                Do you want a random quiz or a topic-based quiz?
               </div>
-              <span className={styles.userAvatar}>👤</span>
-            </motion.div>
-          )}
+            </div>
 
-          {step === STEPS.TOPIC && (
+            <motion.div
+              className={styles.optionsRow}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <button
+                className={styles.optionPill}
+                onClick={() => handleModeSelect('random')}
+              >
+                🎲 Random Quiz
+              </button>
+              <button
+                className={styles.optionPill}
+                onClick={() => handleModeSelect('topic')}
+              >
+                📚 Topic Quiz
+              </button>
+            </motion.div>
+          </div>
+        )}
+
+        {/* Topic Selection (only for topic mode) */}
+        {config.mode === 'topic' && step === STEPS.TOPIC && (
+          <div className={styles.messageGroup}>
+            <div className={styles.botMessage}>
+              <span className={styles.botAvatar}>🤖</span>
+              <div className={styles.bubble}>
+                What topic would you like to be quizzed on?
+              </div>
+            </div>
             <motion.div
               className={styles.optionsGrid}
               initial={{ opacity: 0, y: 10 }}
@@ -95,11 +126,11 @@ export default function QuizSetup({ onStart }) {
                 </button>
               ))}
             </motion.div>
-          )}
-        </div>
+          </div>
+        )}
 
-        {/* Difficulty Selection */}
-        {step !== STEPS.TOPIC && (
+        {/* Difficulty Selection (only for topic mode) */}
+        {config.mode === 'topic' && step === STEPS.DIFFICULTY && (
           <div className={styles.messageGroup}>
             <div className={styles.botMessage}>
               <span className={styles.botAvatar}>🤖</span>
@@ -107,42 +138,26 @@ export default function QuizSetup({ onStart }) {
                 Great choice! What difficulty level?
               </div>
             </div>
-
-            {step !== STEPS.DIFFICULTY && config.difficulty && (
-              <motion.div
-                className={styles.userMessage}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-              >
-                <div className={styles.bubble}>
-                  {config.difficulty.charAt(0).toUpperCase() + config.difficulty.slice(1)}
-                </div>
-                <span className={styles.userAvatar}>👤</span>
-              </motion.div>
-            )}
-
-            {step === STEPS.DIFFICULTY && (
-              <motion.div
-                className={styles.optionsRow}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-              >
-                {difficulties.map((diff) => (
-                  <button
-                    key={diff}
-                    className={`${styles.optionPill} ${styles[diff]}`}
-                    onClick={() => handleDifficultySelect(diff)}
-                  >
-                    {diff.charAt(0).toUpperCase() + diff.slice(1)}
-                  </button>
-                ))}
-              </motion.div>
-            )}
+            <motion.div
+              className={styles.optionsRow}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              {difficulties.map((diff) => (
+                <button
+                  key={diff}
+                  className={`${styles.optionPill} ${styles[diff]}`}
+                  onClick={() => handleDifficultySelect(diff)}
+                >
+                  {diff.charAt(0).toUpperCase() + diff.slice(1)}
+                </button>
+              ))}
+            </motion.div>
           </div>
         )}
 
-        {/* Question Count */}
-        {step !== STEPS.TOPIC && step !== STEPS.DIFFICULTY && (
+        {/* Question Count (both modes) */}
+        {step === STEPS.COUNT && (
           <div className={styles.messageGroup}>
             <div className={styles.botMessage}>
               <span className={styles.botAvatar}>🤖</span>
@@ -150,37 +165,21 @@ export default function QuizSetup({ onStart }) {
                 How many questions would you like?
               </div>
             </div>
-
-            {step !== STEPS.COUNT && (
-              <motion.div
-                className={styles.userMessage}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-              >
-                <div className={styles.bubble}>
-                  {config.questionCount} questions
-                </div>
-                <span className={styles.userAvatar}>👤</span>
-              </motion.div>
-            )}
-
-            {step === STEPS.COUNT && (
-              <motion.div
-                className={styles.optionsRow}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-              >
-                {[3, 5, 10].map((count) => (
-                  <button
-                    key={count}
-                    className={styles.optionPill}
-                    onClick={() => handleCountSelect(count)}
-                  >
-                    {count} Questions
-                  </button>
-                ))}
-              </motion.div>
-            )}
+            <motion.div
+              className={styles.optionsRow}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              {[3, 5, 10].map((count) => (
+                <button
+                  key={count}
+                  className={styles.optionPill}
+                  onClick={() => handleCountSelect(count)}
+                >
+                  {count} Questions
+                </button>
+              ))}
+            </motion.div>
           </div>
         )}
 
@@ -197,7 +196,6 @@ export default function QuizSetup({ onStart }) {
                 Perfect! Ready to start your quiz?
               </div>
             </div>
-
             <motion.button
               className={styles.startButton}
               onClick={handleStart}
