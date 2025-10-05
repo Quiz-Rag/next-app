@@ -1,0 +1,210 @@
+{
+  "network-fundamentals": {
+    "easy": [
+      {
+        "id": "nf-e-1",
+        "question": "What does IP stand for in networking?",
+        "type": "mcq",
+        "options": ["Internet Protocol", "Internal Process", "Integrated Program", "Information Package"],
+        "correct": 0,
+        "explanation": "IP stands for Internet Protocol, which is the principal protocol for relaying datagrams across network boundaries."
+      },
+      {
+        "id": "nf-e-2",
+        "question": "Which layer of the OSI model is responsible for routing?",
+        "type": "mcq",
+        "options": ["Physical", "Data Link", "Network", "Transport"],
+        "correct": 2,
+        "explanation": "The Network layer (Layer 3) handles routing and forwarding of packets between different networks."
+      },
+      {
+        "id": "nf-e-3",
+        "question": "What is the default port for HTTP?",
+        "type": "mcq",
+        "options": ["21", "22", "80", "443"],
+        "correct": 2,
+        "explanation": "HTTP uses port 80 by default, while HTTPS uses port 443."
+      },
+      {
+        "id": "nf-e-4",
+        "question": "What does DNS resolve?",
+        "type": "mcq",
+        "options": ["IP to MAC address", "Domain name to IP address", "Port to service", "Email to username"],
+        "correct": 1,
+        "explanation": "DNS (Domain Name System) translates human-readable domain names into IP addresses."
+      },
+      {
+        "id": "nf-e-5",
+        "question": "Which protocol is connection-oriented?",
+        "type": "mcq",
+        "options": ["UDP", "TCP", "ICMP", "ARP"],
+        "correct": 1,
+        "explanation": "TCP is connection-oriented and establishes a reliable connection before data transfer."
+      }
+    ],
+    "medium": [
+      {
+        "id": "nf-m-1",
+        "question": "What is the purpose of ARP?",
+        "type": "mcq",
+        "options": ["Resolve IP to MAC address", "Route packets", "Encrypt data", "Compress files"],
+        "correct": 0,
+        "explanation": "ARP (Address Resolution Protocol) maps IP addresses to physical MAC addresses on a local network."
+      },
+      {
+        "id": "nf-m-2",
+        "question": "Which TCP flag is used to initiate a connection?",
+        "type": "mcq",
+        "options": ["ACK", "SYN", "FIN", "RST"],
+        "correct": 1,
+        "explanation": "The SYN flag initiates a TCP connection as part of the three-way handshake."
+      },
+      {
+        "id": "nf-m-3",
+        "question": "What is the subnet mask for a /24 network?",
+        "type": "mcq",
+        "options": ["255.255.0.0", "255.255.255.0", "255.255.255.128", "255.0.0.0"],
+        "correct": 1,
+        "explanation": "A /24 CIDR notation corresponds to subnet mask 255.255.255.0, providing 256 addresses."
+      },
+      {
+        "id": "nf-m-4",
+        "question": "Which protocol is used to automatically assign IP addresses?",
+        "type": "mcq",
+        "options": ["DNS", "DHCP", "FTP", "SMTP"],
+        "correct": 1,
+        "explanation": "DHCP (Dynamic Host Configuration Protocol) automatically assigns IP addresses to devices on a network."
+      },
+      {
+        "id": "nf-m-5",
+        "question": "What is the maximum size of a TCP segment?",
+        "type": "mcq",
+        "options": ["64 KB", "1500 bytes", "MTU dependent", "Unlimited"],
+        "correct": 2,
+        "explanation": "TCP segment size depends on the Maximum Transmission Unit (MTU) of the network path."
+      }
+    ],
+    "hard": [
+      {
+        "id": "nf-h-1",
+        "question": "In BGP, what is the purpose of AS_PATH?",
+        "type": "mcq",
+        "options": ["Prevent routing loops", "Encrypt routes", "Compress routing tables", "Load balancing"],
+        "correct": 0,
+        "explanation": "AS_PATH in BGP lists all autonomous systems a route has traversed, preventing routing loops."
+      },
+      {
+        "id": "nf-h-2",
+        "question": "What is the purpose of TCP window scaling?",
+        "type": "mcq",
+        "options": ["Improve security", "Support larger receive windows", "Reduce latency", "Enable multiplexing"],
+        "correct": 1,
+        "explanation": "TCP window scaling allows for larger receive windows beyond the 65,535 byte limit for high-bandwidth networks."
+      },
+      {
+        "id": "nf-h-3",
+        "question": "Which routing protocol uses the Dijkstra algorithm?",
+        "type": "mcq",
+        "options": ["RIP", "OSPF", "BGP", "EIGRP"],
+        "correct": 1,
+        "explanation": "OSPF (Open Shortest Path First) uses Dijkstra's algorithm to calculate the shortest path tree."
+      }
+    ]
+  },
+  "cryptography": {
+    "easy": [
+      {
+        "id": "cr-e-1",
+        "question": "What does SSL/TLS provide?",
+        "type": "mcq",
+        "options": ["Authentication only", "Encryption and authentication", "Compression", "Routing"],
+        "correct": 1,
+        "explanation": "SSL/TLS provides both encryption for data confidentiality and authentication to verify identities."
+      },
+      {
+        "id": "cr-e-2",
+        "question": "Which is a symmetric encryption algorithm?",
+        "type": "mcq",
+        "options": ["RSA", "AES", "ECC", "DSA"],
+        "correct": 1,
+        "explanation": "AES (Advanced Encryption Standard) is a symmetric key algorithm using the same key for encryption and decryption."
+      },
+      {
+        "id": "cr-e-3",
+        "question": "What is the purpose of a hash function?",
+        "type": "mcq",
+        "options": ["Encrypt data", "Create fixed-size digest", "Generate keys", "Compress files"],
+        "correct": 1,
+        "explanation": "Hash functions create a fixed-size digest from variable-length input, useful for integrity verification."
+      }
+    ],
+    "medium": [
+      {
+        "id": "cr-m-1",
+        "question": "What attack exploits weak random number generation?",
+        "type": "mcq",
+        "options": ["SQL Injection", "Predictable key attack", "Buffer overflow", "XSS"],
+        "correct": 1,
+        "explanation": "Weak random number generation can lead to predictable keys, compromising cryptographic security."
+      },
+      {
+        "id": "cr-m-2",
+        "question": "What is the key size of AES-256?",
+        "type": "mcq",
+        "options": ["128 bits", "192 bits", "256 bits", "512 bits"],
+        "correct": 2,
+        "explanation": "AES-256 uses a 256-bit key length, providing strong encryption security."
+      }
+    ],
+    "hard": [
+      {
+        "id": "cr-h-1",
+        "question": "What is the primary advantage of elliptic curve cryptography over RSA?",
+        "type": "mcq",
+        "options": ["Faster computation", "Smaller key size for equivalent security", "Easier implementation", "Better quantum resistance"],
+        "correct": 1,
+        "explanation": "ECC provides equivalent security to RSA with much smaller key sizes, improving efficiency."
+      }
+    ]
+  },
+  "web-security": {
+    "easy": [
+      {
+        "id": "ws-e-1",
+        "question": "What does XSS stand for?",
+        "type": "mcq",
+        "options": ["Cross-Site Scripting", "Extra Security System", "XML Security Standard", "Extended SSL"],
+        "correct": 0,
+        "explanation": "XSS (Cross-Site Scripting) is a vulnerability allowing attackers to inject malicious scripts into web pages."
+      },
+      {
+        "id": "ws-e-2",
+        "question": "What HTTP header helps prevent clickjacking?",
+        "type": "mcq",
+        "options": ["Content-Type", "X-Frame-Options", "Accept", "Host"],
+        "correct": 1,
+        "explanation": "X-Frame-Options header prevents a page from being loaded in an iframe, mitigating clickjacking attacks."
+      }
+    ],
+    "medium": [
+      {
+        "id": "ws-m-1",
+        "question": "What is the purpose of CSRF tokens?",
+        "type": "mcq",
+        "options": ["Encrypt data", "Prevent cross-site request forgery", "Authenticate users", "Compress responses"],
+        "correct": 1,
+        "explanation": "CSRF tokens validate that requests originate from the legitimate application, not malicious sites."
+      }
+    ],
+    "hard": [
+      {
+        "id": "ws-h-1",
+        "question": "What is a timing attack in web security?",
+        "type": "mcq",
+        "options": ["DoS attack", "Side-channel attack using execution time", "Race condition", "Session hijacking"],
+        "correct": 1,
+        "explanation": "Timing attacks exploit variations in execution time to extract sensitive information like cryptographic keys."
+      }
+    ]
+  }
+}

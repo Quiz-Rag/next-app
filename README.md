@@ -1,36 +1,101 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NetSec Arcade
+
+An interactive network security learning platform built with Next.js, featuring a game-style quiz system and educational modules.
+
+## Features
+
+- **Quiz Module** - Interactive quiz system with:
+  - Chat-style setup interface
+  - Multiple topics (Network Fundamentals, Cryptography, Web Security)
+  - Three difficulty levels (Easy, Medium, Hard)
+  - Animated loading and grading screens
+  - Detailed results with explanations
+  - Local leaderboard tracking
+
+- **Coming Soon:**
+  - Train Database
+  - Wireshark Analysis
+  - AI Tutor
+
+## Tech Stack
+
+- **Next.js 15** (App Router)
+- **React 19**
+- **Framer Motion** - Animations
+- **Lucide React** - Icons
+- **CSS Modules** - Styling
+- **Local JSON** - Mock data storage
 
 ## Getting Started
 
-First, run the development server:
-
+1. Install dependencies:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Run the development server:
+```bash
+npm run dev
+```
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+3. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Project Structure
 
-## Learn More
+```
+next-app/
+├── app/                    # Next.js App Router pages
+│   ├── layout.js          # Root layout with navigation
+│   ├── page.js            # Home (redirects to quiz)
+│   ├── quiz/              # Quiz module
+│   ├── train-db/          # Train DB (under development)
+│   ├── wireshark/         # Wireshark (under development)
+│   └── tutor/             # Tutor (under development)
+├── components/            # Reusable components
+│   ├── Navigation.js      # Top navigation bar
+│   ├── UnderDevelopment.js
+│   └── quiz/              # Quiz-specific components
+│       ├── QuizSetup.js
+│       ├── QuizLoading.js
+│       ├── QuizPlay.js
+│       ├── QuizGrading.js
+│       └── QuizResults.js
+├── data/                  # Mock JSON data
+│   ├── quiz-questions.json
+│   └── quiz-topics.json
+└── lib/                   # Utility functions
+    └── quizData.js        # Quiz data management
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Quiz Module Usage
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Navigate to the Quiz page
+2. Select a topic from the chat interface
+3. Choose your difficulty level
+4. Select the number of questions
+5. Answer the questions
+6. View your results and detailed feedback
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Quiz results are stored in browser localStorage and displayed on the leaderboard.
 
-## Deploy on Vercel
+## Development
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+This project uses:
+- **Pure JavaScript** (no TypeScript)
+- **CSS Modules** for component styling
+- **No Tailwind** - custom CSS with design tokens
+- **Local JSON files** for data (ready for future FastAPI integration)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Future Enhancements
+
+- FastAPI backend integration
+- Train Database module
+- Wireshark packet analysis tool
+- AI-powered tutor chatbot
+- User authentication
+- Progress tracking
+- Certificate generation
+
+## License
+
+MIT

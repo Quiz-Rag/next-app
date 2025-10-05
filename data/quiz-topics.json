@@ -1,0 +1,35 @@
+{
+  "topics": [
+    {
+      "id": "network-fundamentals",
+      "name": "Network Fundamentals",
+      "description": "Core networking concepts, protocols, and architecture",
+      "icon": "network"
+    },
+    {
+      "id": "cryptography",
+      "name": "Cryptography",
+      "description": "Encryption, hashing, and secure communication",
+      "icon": "lock"
+    },
+    {
+      "id": "web-security",
+      "name": "Web Security",
+      "description": "Common web vulnerabilities and defenses",
+      "icon": "shield"
+    }
+  ],
+  "difficulties": ["easy", "medium", "hard"],
+  "questionTypes": [
+    {
+      "id": "mcq",
+      "name": "Multiple Choice",
+      "description": "Choose the correct answer from options"
+    },
+    {
+      "id": "true-false",
+      "name": "True/False",
+      "description": "Simple true or false questions"
+    }
+  ]
+}
