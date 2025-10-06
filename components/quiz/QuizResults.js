@@ -205,7 +205,7 @@ export default function QuizResults({ results, onRestart }) {
                 <span className={styles.rank}>#{index + 1}</span>
                 <div className={styles.leaderboardInfo}>
                   <span className={styles.leaderboardTopic}>
-                    {entry.config.topic.replace('-', ' ')}
+                    {entry.config?.topic?.replace('-', ' ') || 'Random Quiz'}
                   </span>
                   <span className={styles.leaderboardDifficulty}>
                     {entry.config.difficulty}
