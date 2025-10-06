@@ -20,6 +20,22 @@
   --glow-secondary: rgba(124, 58, 237, 0.3);
 }
 
+[data-theme='light'] {
+  --bg-dark: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f1f5f9;
+  --accent-primary: #0891b2;
+  --accent-secondary: #7c3aed;
+  --accent-success: #10b981;
+  --accent-warning: #f59e0b;
+  --accent-danger: #ef4444;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --border-color: #e2e8f0;
+  --glow-primary: rgba(8, 145, 178, 0.2);
+  --glow-secondary: rgba(124, 58, 237, 0.2);
+}
+
 html,
 body {
   max-width: 100vw;
