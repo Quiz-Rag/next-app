@@ -21,7 +21,7 @@ export default function TutorPage() {
     setFiles(list);
   }
 
-  async function ingestFiles() {
+  async function insertFiles() {
     if (files.length === 0) return alert("Pick up to 10 files first.");
     const fd = new FormData();
     files.forEach(f => fd.append("files", f));
@@ -38,7 +38,7 @@ export default function TutorPage() {
     }
   }
 
-  async function ingestText() {
+  async function insertText() {
     if (!notes.trim()) return alert("Paste some notes.");
     setBusy(true);
     try {
@@ -48,7 +48,7 @@ export default function TutorPage() {
         body: JSON.stringify({ text: notes })
       });
       const j = await r.json();
-      if (!r.ok) throw new Error(j.detail || "Ingest failed");
+      if (!r.ok) throw new Error(j.detail || "Insert failed");
       alert(`Added: ${j.added} | Total: ${j.total}`);
     } catch (e) {
       alert(String(e));
@@ -101,14 +101,14 @@ export default function TutorPage() {
 
       <h3>1) Upload your notes (up to 10 files)</h3>
       <input type="file" multiple onChange={onPickFiles} accept=".pdf,.docx,.txt" />
-      <button onClick={ingestFiles} disabled={busy}>Ingest Files</button>
+      <button onClick={insertFiles} disabled={busy}>Insert Files</button>
 
-      <h3 style={{marginTop:24}}>…or paste text</h3>
+      <h3 style={{marginTop:24}}>Paste Text</h3>
       <textarea rows={6} style={{width:"100%"}}
         value={notes} onChange={e=>setNotes(e.target.value)}
         placeholder="Paste class notes, slides text, definitions…" />
       <br/>
-      <button onClick={ingestText} disabled={busy}>Ingest Text</button>
+      <button onClick={insertText} disabled={busy}>Insert Text</button>
       <button onClick={reset} style={{marginLeft:8}} disabled={busy}>Reset Store</button>
 
       <h3 style={{marginTop:24}}>2) Ask a question</h3>
