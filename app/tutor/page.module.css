@@ -1,0 +1,114 @@
+/* Layout */
+.container {
+  min-height: calc(100vh - 120px);
+  display: grid;
+  place-items: start center;
+  padding: 2rem 1rem;
+  background: #0b0f1a; /* deep navy like Quiz */
+  color: #e2e8f0;
+  font-family: system-ui, -apple-system, Segoe UI, Inter, Roboto, "Helvetica Neue",
+    Arial, "Noto Sans", "Liberation Sans", "Apple Color Emoji", "Segoe UI Emoji";
+}
+
+/* Center card like Quiz Setup */
+.card {
+  width: 100%;
+  max-width: 980px;
+  background: #0f172a;            /* dark card */
+  border: 1px solid #1f2a44;      /* soft border */
+  border-radius: 20px;
+  padding: 22px;
+  box-shadow: 0 6px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,0.03);
+}
+
+/* Heading (blue gradient like your Quiz) */
+.title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  text-align: center;
+  margin: 2px 0 16px;
+  background: linear-gradient(90deg, #60a5fa, #6366f1);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.subtitle {
+  text-align: center;
+  color: #9fb2c9;
+  margin-bottom: 12px;
+}
+
+.divider {
+  height: 1px;
+  background: #1e293b;
+  margin: 10px 0 18px;
+  border: none;
+}
+
+/* Rows */
+.row, .rowLeft {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+}
+.row { justify-content: center; }
+.rowLeft { justify-content: flex-start; }
+
+/* Buttons */
+.btn, .btnPrimary, .btnGhost, .linkBtn {
+  border-radius: 999px; /* pill */
+  padding: 10px 16px;
+  font-weight: 600;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform .06s ease, box-shadow .2s ease, opacity .2s ease;
+}
+.btn:active, .btnPrimary:active, .btnGhost:active { transform: translateY(1px); }
+
+.btn { background:#1f2937; color:#e5e7eb; border-color:#273244; }
+.btn:hover { background:#273244; }
+
+.btnPrimary {
+  background: linear-gradient(90deg, #6366f1, #3b82f6);
+  color:#fff;
+  box-shadow: 0 4px 16px rgba(59,130,246,.35);
+}
+.btnPrimary:hover { box-shadow: 0 6px 22px rgba(59,130,246,.45); }
+
+.btnGhost { background:transparent; color:#e2e8f0; border-color:#334155; }
+.btnGhost:hover { background:#111827; }
+
+.linkBtn { background:transparent; color:#93c5fd; padding:6px 10px; }
+.linkBtn:hover { text-decoration: underline; }
+
+/* Inputs */
+.input, .textarea {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid #26334a;
+  background: #0c1324;
+  color: #e2e8f0;
+  padding: 12px 14px;
+  font-size: .98rem;
+}
+.input:focus, .textarea:focus {
+  outline: none;
+  border-color: #4b7bd9;
+  box-shadow: 0 0 0 3px rgba(80,130,255,.15);
+}
+
+/* Sections */
+.sectionTitle { color:#c6d5f1; margin: 10px 0 8px; font-weight:700; }
+
+/* File list / answer / cites */
+.fileList { margin-top:10px; display:grid; gap:8px; }
+.fileItem {
+  display:flex; align-items:center; justify-content:space-between;
+  background:#0c1324; border:1px solid #1f2a44; border-radius:12px; padding:8px 12px;
+}
+.truncate { max-width:78%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.muted { color:#8aa0bd; font-size:.9rem; }
+
+.answerBox {
+  background:#0c1324; border:1px solid #1f2a44; border-radius:12px; padding:12px 14px;
+  min-height:64px; white-space:pre-wrap;
+}
+.citeList { margin-top:8px; padding-left:1.1rem; }
