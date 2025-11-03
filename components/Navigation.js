@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Database, BrainCircuit, Network, GraduationCap } from 'lucide-react';
+import { Database, BrainCircuit, Network, GraduationCap, Sun, Moon } from 'lucide-react';
+import { useTheme } from '@/contexts/ThemeContext';
 import styles from './Navigation.module.css';
 
 const navItems = [
@@ -15,6 +16,7 @@ const navItems = [
 
 export default function Navigation() {
   const pathname = usePathname();
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <nav className={styles.nav}>
@@ -54,6 +56,14 @@ export default function Navigation() {
             );
           })}
         </ul>
+
+        <button
+          onClick={toggleTheme}
+          className={styles.themeToggle}
+          aria-label="Toggle theme"
+        >
+          {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+        </button>
       </div>
     </nav>
   );
