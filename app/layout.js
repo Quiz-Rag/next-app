@@ -1,5 +1,6 @@
 import { Inter } from 'next/font/google';
 import Navigation from '@/components/Navigation';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 import './globals.css';
 
 // Load Inter and define a CSS variable
@@ -15,10 +16,12 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={inter.variable}>
-      <body>
-        <Navigation />
-        <main>{children}</main>
+    <html lang="en">
+      <body className={inter.className}>
+        <ThemeProvider>
+          <Navigation />
+          <main>{children}</main>
+        </ThemeProvider>
       </body>
     </html>
   );
