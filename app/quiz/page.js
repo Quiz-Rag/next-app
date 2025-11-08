@@ -1,6 +1,6 @@
 'use client';
 import questionBank from '@/data/quiz-questions.json';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import QuizSetup from '@/components/quiz/QuizSetup';
 import QuizLoading from '@/components/quiz/QuizLoading';
@@ -18,12 +18,45 @@ const STAGES = {
   RESULTS: 'results',
 };
 
+async function startTrace(seconds = 10, filter = 'tcp port 3000') {
+  const r = await fetch('/api/trace/start', {
+    method: "POST",
+    headers: {'content-type': 'application/json'},
+    body: JSON.stringify({seconds, filter})
+  });
+  const j = await r.json();
+  return j?.capture?.pcap || null;
+}
+
+async function telemetry(tag, payload = {}) {
+  try {
+    await fetch('/api/telemetry/quiz', {
+      method: "POST",
+      headers: {'content-type':'application/json'},
+      body: JSON.stringify({tag, at: Date.now(), ...payload })
+    });
+  } catch{}
+}
+
 export default function QuizPage() {
   const [stage, setStage] = useState(STAGES.SETUP);
   const [config, setConfig] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState([]);
   const [results, setResults] = useState(null);
+  const [tracePcap, setTracePcap] = useState(null);
+  const [traceReport, setTracereport] = useState(null);
+  useEffect(() => {
+    if(!tracePcap) return;
+    const t = setTimeout(async () => {
+      try {
+        const r = await fetch('/api/trace/report?pcap=' + encodeURIComponent(tracePcap));
+        const j = await r.json();
+        if (j.ok) setTracereport(j.report);
+      }catch {}
+    }, 9000);
+    return () => clearTimeout(t);
+  }, [tracePcap]);
 
   function shuffle(array) {
   const a = array.slice();
@@ -35,6 +68,10 @@ export default function QuizPage() {
 }
 
   const handleStartQuiz = (quizConfig) => {
+    const pcapPath = startTrace(10);
+    setTracePcap(pcapPath);
+    try { localStorage.setItem('lastPcap', pcapPath); } catch {}
+    telemetry('quiz_start', {topic: quizConfig.topic, difficulty: quizConfig.difficulty});
     setConfig(quizConfig);
     setStage(STAGES.LOADING);
 
@@ -86,6 +123,7 @@ export default function QuizPage() {
         config,
       });
       setResults(savedResults);
+      telemetry('quiz_submit', {answered: answers.filter(Boolean).length});
       setStage(STAGES.RESULTS);
     }, 2500);
   };
