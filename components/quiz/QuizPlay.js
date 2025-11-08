@@ -12,9 +12,9 @@ export default function QuizPlay({ questions, onSubmit, config }) {
   const question = questions[currentQuestion];
   const progress = ((currentQuestion + 1) / questions.length) * 100;
 
-  const handleAnswer = (optionIndex) => {
+  const handleAnswer = (value) => {
     const newAnswers = [...answers];
-    newAnswers[currentQuestion] = optionIndex;
+    newAnswers[currentQuestion] = value;
     setAnswers(newAnswers);
   };
 
@@ -34,11 +34,80 @@ export default function QuizPlay({ questions, onSubmit, config }) {
     onSubmit(answers);
   };
 
-  const allAnswered = answers.every((answer) => answer !== null);
+  const allAnswered = answers.every((answer) => answer !== null && answer !== '');
   const isLastQuestion = currentQuestion === questions.length - 1;
+
+  // --- Conditional render function for question types ---
+  const renderQuestionType = (q) => {
+    switch (q.type) {
+      case 'mcq':
+        return (
+          <div className={styles.optionsContainer}>
+            {q.options.map((option, index) => {
+              const isSelected = answers[currentQuestion] === index;
+              return (
+                <motion.button
+                  key={index}
+                  className={`${styles.optionButton} ${isSelected ? styles.selected : ''}`}
+                  onClick={() => handleAnswer(index)}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <span className={styles.optionLabel}>
+                    {String.fromCharCode(65 + index)}
+                  </span>
+                  <span className={styles.optionText}>{option}</span>
+                  {isSelected && (
+                    <CheckCircle className={styles.checkIcon} size={20} />
+                  )}
+                </motion.button>
+              );
+            })}
+          </div>
+        );
+
+      case 'true_false':
+        return (
+          <div className={styles.optionsContainer}>
+            {['True', 'False'].map((option, index) => {
+              const value = option.toLowerCase() === 'true';
+              const isSelected = answers[currentQuestion] === value;
+              return (
+                <motion.button
+                  key={option}
+                  className={`${styles.optionButton} ${isSelected ? styles.selected : ''}`}
+                  onClick={() => handleAnswer(value)}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <span className={styles.optionText}>{option}</span>
+                  {isSelected && <CheckCircle className={styles.checkIcon} size={20} />}
+                </motion.button>
+              );
+            })}
+          </div>
+        );
+
+      case 'open':
+        return (
+          <div className={styles.openContainer}>
+            <textarea
+              className={styles.openTextarea}
+              placeholder="Type your answer here..."
+              value={answers[currentQuestion] || ''}
+              onChange={(e) => handleAnswer(e.target.value)}
+            />
+          </div>
+        );
+
+      default:
+        return <p>Unsupported question type.</p>;
+    }
+  };
 
   return (
     <div className={styles.container}>
+      {/* Header and progress */}
       <div className={styles.header}>
         <div className={styles.progressWrapper}>
           <div className={styles.progressInfo}>
@@ -58,6 +127,7 @@ export default function QuizPlay({ questions, onSubmit, config }) {
         </div>
       </div>
 
+      {/* Question Card */}
       <motion.div
         key={currentQuestion}
         className={styles.questionCard}
@@ -67,32 +137,10 @@ export default function QuizPlay({ questions, onSubmit, config }) {
         transition={{ duration: 0.3 }}
       >
         <h2 className={styles.questionText}>{question.question}</h2>
-
-        <div className={styles.optionsContainer}>
-          {question.options.map((option, index) => {
-            const isSelected = answers[currentQuestion] === index;
-
-            return (
-              <motion.button
-                key={index}
-                className={`${styles.optionButton} ${isSelected ? styles.selected : ''}`}
-                onClick={() => handleAnswer(index)}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <span className={styles.optionLabel}>
-                  {String.fromCharCode(65 + index)}
-                </span>
-                <span className={styles.optionText}>{option}</span>
-                {isSelected && (
-                  <CheckCircle className={styles.checkIcon} size={20} />
-                )}
-              </motion.button>
-            );
-          })}
-        </div>
+        {renderQuestionType(question)}
       </motion.div>
 
+      {/* Navigation Buttons */}
       <div className={styles.navigation}>
         <button
           className={styles.navButton}
@@ -107,7 +155,7 @@ export default function QuizPlay({ questions, onSubmit, config }) {
           {questions.map((_, index) => (
             <button
               key={index}
-              className={`${styles.dot} ${index === currentQuestion ? styles.activeDot : ''} ${answers[index] !== null ? styles.answeredDot : ''}`}
+              className={`${styles.dot} ${index === currentQuestion ? styles.activeDot : ''} ${answers[index] !== null && answers[index] !== '' ? styles.answeredDot : ''}`}
               onClick={() => setCurrentQuestion(index)}
               aria-label={`Go to question ${index + 1}`}
             />
@@ -118,7 +166,7 @@ export default function QuizPlay({ questions, onSubmit, config }) {
           <button
             className={styles.navButton}
             onClick={handleNext}
-            disabled={answers[currentQuestion] === null}
+            disabled={answers[currentQuestion] === null || answers[currentQuestion] === ''}
           >
             Next
             <ChevronRight size={20} />

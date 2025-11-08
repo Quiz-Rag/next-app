@@ -40,6 +40,76 @@
         "options": ["UDP", "TCP", "ICMP", "ARP"],
         "correct": 1,
         "explanation": "TCP is connection-oriented and establishes a reliable connection before data transfer."
+      },
+      {
+        "id": "nf-e-tf-1",
+        "question": "DNS resolves domain names to IP addresses.",
+        "type": "true_false",
+        "answer": true,
+        "explanation": "DNS converts human-readable names to IP addresses so computers can locate each other."
+      },
+      {
+        "id": "nf-e-tf-2",
+        "question": "The Network layer handles physical transmission of data bits.",
+        "type": "true_false",
+        "answer": false,
+        "explanation": "Physical transmission happens at the Physical layer, not the Network layer."
+      },
+      {
+        "id": "nf-e-tf-3",
+        "question": "TCP guarantees reliable delivery of packets.",
+        "type": "true_false",
+        "answer": true,
+        "explanation": "TCP includes acknowledgements and retransmissions to ensure reliable delivery."
+      },
+      {
+        "id": "nf-e-tf-4",
+        "question": "HTTP is an example of a Transport layer protocol.",
+        "type": "true_false",
+        "answer": false,
+        "explanation": "HTTP operates at the Application layer, not the Transport layer."
+      },
+      {
+        "id": "nf-e-tf-5",
+        "question": "MAC addresses are used for local network communication.",
+        "type": "true_false",
+        "answer": true,
+        "explanation": "MAC addresses identify devices on the same local network."
+      },
+      {
+        "id": "nf-e-o-1",
+        "question": "Explain the difference between TCP and UDP.",
+        "type": "open",
+        "expected_keywords": ["reliable", "connection-oriented", "faster", "datagram"],
+        "explanation": "TCP provides reliable, ordered delivery while UDP is faster but connectionless."
+      },
+      {
+        "id": "nf-e-o-2",
+        "question": "Describe how DNS contributes to user-friendly internet navigation.",
+        "type": "open",
+        "expected_keywords": ["domain", "IP address", "translate", "human-readable"],
+        "explanation": "DNS lets users access sites via domain names instead of numeric IPs."
+      },
+      {
+        "id": "nf-e-o-3",
+        "question": "What is the function of a router in a network?",
+        "type": "open",
+        "expected_keywords": ["route", "forward", "network", "packet"],
+        "explanation": "Routers direct data packets between different networks."
+      },
+      {
+        "id": "nf-e-o-4",
+        "question": "Why is IP addressing necessary for communication?",
+        "type": "open",
+        "expected_keywords": ["identify", "device", "unique", "communication"],
+        "explanation": "IP addresses uniquely identify devices so data can reach the correct destination."
+      },
+      {
+        "id": "nf-e-o-5",
+        "question": "How does the OSI model help in understanding network communication?",
+        "type": "open",
+        "expected_keywords": ["layers", "structure", "modular", "communication"],
+        "explanation": "The OSI model divides communication tasks into layers to simplify design and troubleshooting."
       }
     ],
     "medium": [
@@ -49,7 +119,7 @@
         "type": "mcq",
         "options": ["Resolve IP to MAC address", "Route packets", "Encrypt data", "Compress files"],
         "correct": 0,
-        "explanation": "ARP (Address Resolution Protocol) maps IP addresses to physical MAC addresses on a local network."
+        "explanation": "ARP maps IP addresses to physical MAC addresses on a local network."
       },
       {
         "id": "nf-m-2",
@@ -65,7 +135,7 @@
         "type": "mcq",
         "options": ["255.255.0.0", "255.255.255.0", "255.255.255.128", "255.0.0.0"],
         "correct": 1,
-        "explanation": "A /24 CIDR notation corresponds to subnet mask 255.255.255.0, providing 256 addresses."
+        "explanation": "A /24 CIDR notation corresponds to subnet mask 255.255.255.0."
       },
       {
         "id": "nf-m-4",
@@ -73,7 +143,7 @@
         "type": "mcq",
         "options": ["DNS", "DHCP", "FTP", "SMTP"],
         "correct": 1,
-        "explanation": "DHCP (Dynamic Host Configuration Protocol) automatically assigns IP addresses to devices on a network."
+        "explanation": "DHCP automatically assigns IP addresses to devices on a network."
       },
       {
         "id": "nf-m-5",
@@ -82,6 +152,76 @@
         "options": ["64 KB", "1500 bytes", "MTU dependent", "Unlimited"],
         "correct": 2,
         "explanation": "TCP segment size depends on the Maximum Transmission Unit (MTU) of the network path."
+      },
+      {
+        "id": "nf-m-tf-1",
+        "question": "DHCP dynamically assigns IP addresses to clients.",
+        "type": "true_false",
+        "answer": true,
+        "explanation": "DHCP automates IP configuration for clients."
+      },
+      {
+        "id": "nf-m-tf-2",
+        "question": "ARP operates at the Network layer of the OSI model.",
+        "type": "true_false",
+        "answer": false,
+        "explanation": "ARP operates between the Data Link and Network layers."
+      },
+      {
+        "id": "nf-m-tf-3",
+        "question": "The SYN flag is used to end a TCP session.",
+        "type": "true_false",
+        "answer": false,
+        "explanation": "The FIN flag ends a session; SYN initiates one."
+      },
+      {
+        "id": "nf-m-tf-4",
+        "question": "A /16 network has more addresses than a /24 network.",
+        "type": "true_false",
+        "answer": true,
+        "explanation": "A /16 has 65,536 addresses; a /24 has 256."
+      },
+      {
+        "id": "nf-m-tf-5",
+        "question": "TCP guarantees in-order packet delivery.",
+        "type": "true_false",
+        "answer": true,
+        "explanation": "TCP reorders packets using sequence numbers."
+      },
+      {
+        "id": "nf-m-o-1",
+        "question": "Explain how DHCP improves network administration efficiency.",
+        "type": "open",
+        "expected_keywords": ["automatic", "assign", "configuration", "manual"],
+        "explanation": "DHCP automates IP assignments, reducing manual configuration errors."
+      },
+      {
+        "id": "nf-m-o-2",
+        "question": "Describe how the TCP three-way handshake establishes a connection.",
+        "type": "open",
+        "expected_keywords": ["SYN", "SYN-ACK", "ACK", "establish"],
+        "explanation": "A connection starts when SYN, SYN-ACK, and ACK messages complete the handshake."
+      },
+      {
+        "id": "nf-m-o-3",
+        "question": "Why does TCP use acknowledgements?",
+        "type": "open",
+        "expected_keywords": ["reliability", "confirmation", "data", "delivery"],
+        "explanation": "Acknowledgements confirm data reception, ensuring reliable transfer."
+      },
+      {
+        "id": "nf-m-o-4",
+        "question": "What is subnetting and why is it important?",
+        "type": "open",
+        "expected_keywords": ["divide", "network", "manage", "security"],
+        "explanation": "Subnetting divides large networks into smaller segments for management and efficiency."
+      },
+      {
+        "id": "nf-m-o-5",
+        "question": "Discuss the role of ARP in a local network.",
+        "type": "open",
+        "expected_keywords": ["map", "IP", "MAC", "communication"],
+        "explanation": "ARP resolves IP addresses to MAC addresses for devices on a LAN."
       }
     ],
     "hard": [
@@ -108,9 +248,26 @@
         "options": ["RIP", "OSPF", "BGP", "EIGRP"],
         "correct": 1,
         "explanation": "OSPF (Open Shortest Path First) uses Dijkstra's algorithm to calculate the shortest path tree."
+      },
+      {
+        "id": "nf-h-4",
+        "question": "Which layer handles congestion control?",
+        "type": "mcq",
+        "options": ["Network", "Transport", "Data Link", "Physical"],
+        "correct": 1,
+        "explanation": "The Transport layer manages congestion control and flow control."
+      },
+      {
+        "id": "nf-h-5",
+        "question": "What is the default administrative distance of OSPF?",
+        "type": "mcq",
+        "options": ["90", "100", "110", "120"],
+        "correct": 2,
+        "explanation": "The default administrative distance of OSPF is 110."
       }
     ]
-  },
+  }
+    ,
   "cryptography": {
     "easy": [
       {
@@ -136,6 +293,92 @@
         "options": ["Encrypt data", "Create fixed-size digest", "Generate keys", "Compress files"],
         "correct": 1,
         "explanation": "Hash functions create a fixed-size digest from variable-length input, useful for integrity verification."
+      },
+      {
+        "id": "cr-e-4",
+        "question": "Which of the following is an asymmetric algorithm?",
+        "type": "mcq",
+        "options": ["AES", "RSA", "DES", "3DES"],
+        "correct": 1,
+        "explanation": "RSA uses a pair of keys (public and private), making it an asymmetric algorithm."
+      },
+      {
+        "id": "cr-e-5",
+        "question": "What does PKI stand for?",
+        "type": "mcq",
+        "options": ["Public Key Infrastructure", "Private Key Interface", "Public Kernel Implementation", "Protected Key Identifier"],
+        "correct": 0,
+        "explanation": "PKI stands for Public Key Infrastructure, a framework for managing digital keys and certificates."
+      },
+      {
+        "id": "cr-e-tf-1",
+        "question": "AES is a symmetric encryption algorithm.",
+        "type": "true_false",
+        "answer": true,
+        "explanation": "AES uses the same key for encryption and decryption."
+      },
+      {
+        "id": "cr-e-tf-2",
+        "question": "RSA uses one key for both encryption and decryption.",
+        "type": "true_false",
+        "answer": false,
+        "explanation": "RSA is asymmetric and uses two keys: public and private."
+      },
+      {
+        "id": "cr-e-tf-3",
+        "question": "Hash functions can be reversed to retrieve the original data.",
+        "type": "true_false",
+        "answer": false,
+        "explanation": "Hashing is one-way and cannot be reversed."
+      },
+      {
+        "id": "cr-e-tf-4",
+        "question": "Digital signatures provide data integrity and authenticity.",
+        "type": "true_false",
+        "answer": true,
+        "explanation": "Digital signatures verify the sender and ensure message integrity."
+      },
+      {
+        "id": "cr-e-tf-5",
+        "question": "SSL and TLS are used for secure communication over the Internet.",
+        "type": "true_false",
+        "answer": true,
+        "explanation": "SSL/TLS protocols secure data transmitted over the web."
+      },
+      {
+        "id": "cr-e-o-1",
+        "question": "Explain the difference between symmetric and asymmetric encryption.",
+        "type": "open",
+        "expected_keywords": ["same key", "different keys", "public", "private"],
+        "explanation": "Symmetric uses one key for both operations, while asymmetric uses public-private pairs."
+      },
+      {
+        "id": "cr-e-o-2",
+        "question": "What role do digital certificates play in network security?",
+        "type": "open",
+        "expected_keywords": ["authentication", "trust", "certificate authority", "identity"],
+        "explanation": "Certificates verify identities and establish trust between communicating parties."
+      },
+      {
+        "id": "cr-e-o-3",
+        "question": "Why are hash functions important for password storage?",
+        "type": "open",
+        "expected_keywords": ["one-way", "security", "store", "plaintext"],
+        "explanation": "Hashes protect passwords by storing non-reversible digests instead of plaintext."
+      },
+      {
+        "id": "cr-e-o-4",
+        "question": "Describe a real-world example of encryption in daily life.",
+        "type": "open",
+        "expected_keywords": ["banking", "TLS", "secure website", "communication"],
+        "explanation": "Encryption secures online banking, messaging, and HTTPS websites."
+      },
+      {
+        "id": "cr-e-o-5",
+        "question": "What is the main purpose of cryptography in network communication?",
+        "type": "open",
+        "expected_keywords": ["confidentiality", "integrity", "authentication", "non-repudiation"],
+        "explanation": "Cryptography ensures data privacy, authenticity, and integrity."
       }
     ],
     "medium": [
@@ -154,19 +397,146 @@
         "options": ["128 bits", "192 bits", "256 bits", "512 bits"],
         "correct": 2,
         "explanation": "AES-256 uses a 256-bit key length, providing strong encryption security."
+      },
+      {
+        "id": "cr-m-3",
+        "question": "Which algorithm is primarily used for digital signatures?",
+        "type": "mcq",
+        "options": ["RSA", "AES", "SHA-256", "MD5"],
+        "correct": 0,
+        "explanation": "RSA is often used to create digital signatures for data integrity."
+      },
+      {
+        "id": "cr-m-4",
+        "question": "What is salting in password hashing?",
+        "type": "mcq",
+        "options": ["Adding extra bits to keys", "Adding random data to passwords before hashing", "Encrypting hashes", "Doubling hash length"],
+        "correct": 1,
+        "explanation": "Salting prevents precomputed hash attacks like rainbow tables."
+      },
+      {
+        "id": "cr-m-5",
+        "question": "Which hashing algorithm is now considered insecure?",
+        "type": "mcq",
+        "options": ["SHA-256", "MD5", "SHA-512", "BLAKE2"],
+        "correct": 1,
+        "explanation": "MD5 is insecure due to collision vulnerabilities."
+      },
+      {
+        "id": "cr-m-tf-1",
+        "question": "SHA-256 produces a 256-bit output.",
+        "type": "true_false",
+        "answer": true,
+        "explanation": "SHA-256 outputs a 256-bit hash value."
+      },
+      {
+        "id": "cr-m-tf-2",
+        "question": "Digital signatures ensure data confidentiality.",
+        "type": "true_false",
+        "answer": false,
+        "explanation": "They ensure integrity and authenticity, not confidentiality."
+      },
+      {
+        "id": "cr-m-tf-3",
+        "question": "Symmetric encryption is generally faster than asymmetric encryption.",
+        "type": "true_false",
+        "answer": true,
+        "explanation": "Symmetric algorithms are computationally simpler and faster."
+      },
+      {
+        "id": "cr-m-tf-4",
+        "question": "Salting makes passwords harder to attack using precomputed hashes.",
+        "type": "true_false",
+        "answer": true,
+        "explanation": "Salts make each hash unique, even for identical passwords."
+      },
+      {
+        "id": "cr-m-tf-5",
+        "question": "Public keys are kept secret in asymmetric encryption.",
+        "type": "true_false",
+        "answer": false,
+        "explanation": "Public keys are shared openly; private keys are kept secret."
+      },
+      {
+        "id": "cr-m-o-1",
+        "question": "Explain why MD5 is no longer recommended for secure applications.",
+        "type": "open",
+        "expected_keywords": ["collision", "insecure", "hash", "vulnerable"],
+        "explanation": "MD5 can produce the same hash for different inputs, leading to collisions."
+      },
+      {
+        "id": "cr-m-o-2",
+        "question": "How do digital signatures verify authenticity?",
+        "type": "open",
+        "expected_keywords": ["public key", "private key", "sign", "verify"],
+        "explanation": "The sender signs with a private key; receivers verify with the public key."
+      },
+      {
+        "id": "cr-m-o-3",
+        "question": "What is the purpose of a key exchange algorithm like Diffie-Hellman?",
+        "type": "open",
+        "expected_keywords": ["shared secret", "exchange", "secure", "communication"],
+        "explanation": "It enables two parties to securely establish a shared key over an insecure channel."
+      },
+      {
+        "id": "cr-m-o-4",
+        "question": "Describe why randomness is critical in cryptography.",
+        "type": "open",
+        "expected_keywords": ["unpredictable", "secure", "keys", "entropy"],
+        "explanation": "Randomness prevents predictability in keys and increases security."
+      },
+      {
+        "id": "cr-m-o-5",
+        "question": "What is a rainbow table attack and how does salting prevent it?",
+        "type": "open",
+        "expected_keywords": ["precomputed", "hashes", "salt", "unique"],
+        "explanation": "Rainbow tables use precomputed hashes; salting ensures each password hash is unique."
       }
     ],
     "hard": [
       {
         "id": "cr-h-1",
-        "question": "What is the primary advantage of elliptic curve cryptography over RSA?",
+        "question": "What is the primary advantage of elliptic curve cryptography (ECC) over RSA?",
         "type": "mcq",
-        "options": ["Faster computation", "Smaller key size for equivalent security", "Easier implementation", "Better quantum resistance"],
+        "options": ["Faster computation", "Smaller key size for equivalent security", "Easier implementation", "Quantum resistance"],
         "correct": 1,
-        "explanation": "ECC provides equivalent security to RSA with much smaller key sizes, improving efficiency."
+        "explanation": "ECC provides equivalent security with smaller key sizes, improving efficiency."
+      },
+      {
+        "id": "cr-h-2",
+        "question": "Which cryptographic concept is used to verify message integrity?",
+        "type": "mcq",
+        "options": ["Hashing", "Encryption", "Decryption", "Encoding"],
+        "correct": 0,
+        "explanation": "Hashing verifies data integrity by comparing hash values."
+      },
+      {
+        "id": "cr-h-3",
+        "question": "Which algorithm is resistant to quantum attacks?",
+        "type": "mcq",
+        "options": ["RSA", "ECC", "AES", "Lattice-based encryption"],
+        "correct": 3,
+        "explanation": "Lattice-based algorithms are part of post-quantum cryptography."
+      },
+      {
+        "id": "cr-h-4",
+        "question": "What is the main function of HMAC?",
+        "type": "mcq",
+        "options": ["Key generation", "Message authentication", "Encryption", "Compression"],
+        "correct": 1,
+        "explanation": "HMAC provides message authentication using a cryptographic hash function and secret key."
+      },
+      {
+        "id": "cr-h-5",
+        "question": "Which of the following is NOT a common hashing algorithm?",
+        "type": "mcq",
+        "options": ["SHA-1", "MD5", "RC4", "SHA-256"],
+        "correct": 2,
+        "explanation": "RC4 is a stream cipher, not a hashing algorithm."
       }
     ]
-  },
+  }
+    ,
   "web-security": {
     "easy": [
       {
@@ -175,7 +545,7 @@
         "type": "mcq",
         "options": ["Cross-Site Scripting", "Extra Security System", "XML Security Standard", "Extended SSL"],
         "correct": 0,
-        "explanation": "XSS (Cross-Site Scripting) is a vulnerability allowing attackers to inject malicious scripts into web pages."
+        "explanation": "XSS (Cross-Site Scripting) allows attackers to inject malicious scripts into trusted websites."
       },
       {
         "id": "ws-e-2",
@@ -183,7 +553,101 @@
         "type": "mcq",
         "options": ["Content-Type", "X-Frame-Options", "Accept", "Host"],
         "correct": 1,
-        "explanation": "X-Frame-Options header prevents a page from being loaded in an iframe, mitigating clickjacking attacks."
+        "explanation": "X-Frame-Options prevents web pages from being loaded into iframes on other sites."
+      },
+      {
+        "id": "ws-e-3",
+        "question": "Which of the following is used to secure data transmission on the web?",
+        "type": "mcq",
+        "options": ["HTTP", "FTP", "HTTPS", "DNS"],
+        "correct": 2,
+        "explanation": "HTTPS encrypts data between client and server using SSL/TLS."
+      },
+      {
+        "id": "ws-e-4",
+        "question": "Which attack involves injecting malicious SQL queries into an input field?",
+        "type": "mcq",
+        "options": ["Phishing", "CSRF", "SQL Injection", "DNS Spoofing"],
+        "correct": 2,
+        "explanation": "SQL Injection manipulates database queries through unvalidated input."
+      },
+      {
+        "id": "ws-e-5",
+        "question": "Which protocol is primarily responsible for secure web browsing?",
+        "type": "mcq",
+        "options": ["HTTP", "HTTPS", "FTP", "SMTP"],
+        "correct": 1,
+        "explanation": "HTTPS secures web browsing using encrypted communication channels."
+      },
+      {
+        "id": "ws-e-tf-1",
+        "question": "Cross-Site Scripting (XSS) can be prevented with input validation.",
+        "type": "true_false",
+        "answer": true,
+        "explanation": "Proper input validation and output encoding can prevent XSS."
+      },
+      {
+        "id": "ws-e-tf-2",
+        "question": "HTTPS uses TLS for encryption.",
+        "type": "true_false",
+        "answer": true,
+        "explanation": "HTTPS relies on TLS to secure communication."
+      },
+      {
+        "id": "ws-e-tf-3",
+        "question": "SQL injection can be prevented by using prepared statements.",
+        "type": "true_false",
+        "answer": true,
+        "explanation": "Parameterized queries prevent injection attacks."
+      },
+      {
+        "id": "ws-e-tf-4",
+        "question": "Cookies are inherently secure and cannot be stolen.",
+        "type": "true_false",
+        "answer": false,
+        "explanation": "Cookies can be stolen through XSS or insecure transmission if not protected properly."
+      },
+      {
+        "id": "ws-e-tf-5",
+        "question": "CSRF attacks require the victim to click a malicious link.",
+        "type": "true_false",
+        "answer": true,
+        "explanation": "CSRF exploits a victim’s active session to execute unintended actions."
+      },
+      {
+        "id": "ws-e-o-1",
+        "question": "Explain how HTTPS protects users from eavesdropping.",
+        "type": "open",
+        "expected_keywords": ["encryption", "TLS", "secure", "communication"],
+        "explanation": "HTTPS encrypts data between client and server using TLS, preventing interception."
+      },
+      {
+        "id": "ws-e-o-2",
+        "question": "Describe how input validation helps prevent web vulnerabilities.",
+        "type": "open",
+        "expected_keywords": ["sanitize", "validate", "user input", "prevent injection"],
+        "explanation": "Input validation removes malicious inputs and prevents attacks like SQL injection."
+      },
+      {
+        "id": "ws-e-o-3",
+        "question": "What is the purpose of the Same-Origin Policy?",
+        "type": "open",
+        "expected_keywords": ["restrict", "cross-origin", "security", "scripts"],
+        "explanation": "It restricts how documents or scripts from one origin can interact with resources from another."
+      },
+      {
+        "id": "ws-e-o-4",
+        "question": "Why should session cookies be marked as HttpOnly?",
+        "type": "open",
+        "expected_keywords": ["XSS", "prevent access", "JavaScript", "security"],
+        "explanation": "HttpOnly cookies prevent JavaScript from accessing sensitive session data."
+      },
+      {
+        "id": "ws-e-o-5",
+        "question": "Explain how CSRF tokens protect against attacks.",
+        "type": "open",
+        "expected_keywords": ["token", "validate", "request", "origin"],
+        "explanation": "CSRF tokens verify that requests come from trusted users, blocking forged requests."
       }
     ],
     "medium": [
@@ -193,7 +657,109 @@
         "type": "mcq",
         "options": ["Encrypt data", "Prevent cross-site request forgery", "Authenticate users", "Compress responses"],
         "correct": 1,
-        "explanation": "CSRF tokens validate that requests originate from the legitimate application, not malicious sites."
+        "explanation": "CSRF tokens validate that requests originate from the legitimate application."
+      },
+      {
+        "id": "ws-m-2",
+        "question": "What is a common mitigation for SQL Injection?",
+        "type": "mcq",
+        "options": ["Base64 encoding", "Input validation", "File encryption", "Session tokens"],
+        "correct": 1,
+        "explanation": "Input validation and parameterized queries prevent SQL Injection."
+      },
+      {
+        "id": "ws-m-3",
+        "question": "Which HTTP header enforces HTTPS connections?",
+        "type": "mcq",
+        "options": ["Strict-Transport-Security", "Content-Type", "Access-Control-Allow-Origin", "Referrer-Policy"],
+        "correct": 0,
+        "explanation": "The HSTS header forces browsers to use HTTPS only."
+      },
+      {
+        "id": "ws-m-4",
+        "question": "What type of attack is prevented by input sanitization?",
+        "type": "mcq",
+        "options": ["SQL Injection", "Phishing", "DDoS", "Sniffing"],
+        "correct": 0,
+        "explanation": "Input sanitization prevents SQL Injection and XSS."
+      },
+      {
+        "id": "ws-m-5",
+        "question": "Which vulnerability exploits unsanitized user input in HTML contexts?",
+        "type": "mcq",
+        "options": ["XSS", "CSRF", "MITM", "Brute force"],
+        "correct": 0,
+        "explanation": "XSS allows attackers to inject scripts via unvalidated HTML input."
+      },
+      {
+        "id": "ws-m-tf-1",
+        "question": "HSTS helps prevent downgrade attacks.",
+        "type": "true_false",
+        "answer": true,
+        "explanation": "HSTS enforces HTTPS-only communication, preventing protocol downgrades."
+      },
+      {
+        "id": "ws-m-tf-2",
+        "question": "CSRF attacks can be prevented using unique session tokens.",
+        "type": "true_false",
+        "answer": true,
+        "explanation": "Tokens tied to a session prevent unauthorized actions."
+      },
+      {
+        "id": "ws-m-tf-3",
+        "question": "Phishing attacks exploit software vulnerabilities.",
+        "type": "true_false",
+        "answer": false,
+        "explanation": "Phishing targets human users, not software vulnerabilities."
+      },
+      {
+        "id": "ws-m-tf-4",
+        "question": "XSS can be stored or reflected.",
+        "type": "true_false",
+        "answer": true,
+        "explanation": "Stored XSS is saved on the server; reflected occurs in real-time."
+      },
+      {
+        "id": "ws-m-tf-5",
+        "question": "The Same-Origin Policy allows unrestricted cross-domain communication.",
+        "type": "true_false",
+        "answer": false,
+        "explanation": "The Same-Origin Policy restricts scripts from accessing content across domains."
+      },
+      {
+        "id": "ws-m-o-1",
+        "question": "Explain how HSTS improves web security.",
+        "type": "open",
+        "expected_keywords": ["HTTPS", "force", "encryption", "downgrade"],
+        "explanation": "HSTS forces browsers to always use HTTPS, preventing insecure HTTP fallback."
+      },
+      {
+        "id": "ws-m-o-2",
+        "question": "Describe the difference between reflected and stored XSS.",
+        "type": "open",
+        "expected_keywords": ["stored", "database", "reflected", "response"],
+        "explanation": "Stored XSS persists in a database; reflected XSS occurs immediately in the HTTP response."
+      },
+      {
+        "id": "ws-m-o-3",
+        "question": "How do CSRF tokens enhance web application security?",
+        "type": "open",
+        "expected_keywords": ["verify", "origin", "token", "session"],
+        "explanation": "CSRF tokens confirm requests come from the intended user."
+      },
+      {
+        "id": "ws-m-o-4",
+        "question": "What security risks arise from improper cookie handling?",
+        "type": "open",
+        "expected_keywords": ["theft", "session", "insecure", "HttpOnly"],
+        "explanation": "Cookies without proper flags can be stolen or manipulated."
+      },
+      {
+        "id": "ws-m-o-5",
+        "question": "Why is HTTPS important for preventing man-in-the-middle attacks?",
+        "type": "open",
+        "expected_keywords": ["encryption", "TLS", "intercept", "data"],
+        "explanation": "HTTPS encrypts communication, preventing attackers from reading or altering data."
       }
     ],
     "hard": [
@@ -203,8 +769,41 @@
         "type": "mcq",
         "options": ["DoS attack", "Side-channel attack using execution time", "Race condition", "Session hijacking"],
         "correct": 1,
-        "explanation": "Timing attacks exploit variations in execution time to extract sensitive information like cryptographic keys."
+        "explanation": "Timing attacks exploit response time differences to extract sensitive data."
+      },
+      {
+        "id": "ws-h-2",
+        "question": "Which HTTP header protects against XSS?",
+        "type": "mcq",
+        "options": ["X-Content-Type-Options", "Content-Security-Policy", "Cache-Control", "Referrer-Policy"],
+        "correct": 1,
+        "explanation": "The Content-Security-Policy (CSP) header helps prevent XSS by controlling script sources."
+      },
+      {
+        "id": "ws-h-3",
+        "question": "What is clickjacking?",
+        "type": "mcq",
+        "options": ["Injecting malicious scripts", "Tricking users into clicking hidden elements", "Intercepting network traffic", "Overloading a server"],
+        "correct": 1,
+        "explanation": "Clickjacking overlays hidden UI elements to trick users into unintended actions."
+      },
+      {
+        "id": "ws-h-4",
+        "question": "Which of these attacks exploits side-channel information?",
+        "type": "mcq",
+        "options": ["Timing attack", "SQL injection", "Phishing", "CSRF"],
+        "correct": 0,
+        "explanation": "Timing attacks use response times to infer sensitive data."
+      },
+      {
+        "id": "ws-h-5",
+        "question": "What is a subresource integrity (SRI) check used for?",
+        "type": "mcq",
+        "options": ["Verify integrity of external resources", "Block cookies", "Validate JWT tokens", "Encrypt HTML"],
+        "correct": 0,
+        "explanation": "SRI ensures external scripts or stylesheets haven’t been tampered with."
       }
     ]
   }
 }
+

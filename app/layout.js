@@ -2,7 +2,11 @@ import { Inter } from 'next/font/google';
 import Navigation from '@/components/Navigation';
 import './globals.css';
 
-const inter = Inter({ subsets: ['latin'] });
+// Load Inter and define a CSS variable
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+});
 
 export const metadata = {
   title: 'NetSec Arcade',
@@ -11,8 +15,8 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <html lang="en" className={inter.variable}>
+      <body>
         <Navigation />
         <main>{children}</main>
       </body>

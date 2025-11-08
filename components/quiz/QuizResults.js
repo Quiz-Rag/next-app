@@ -23,8 +23,37 @@ export default function QuizResults({ results, onRestart }) {
     return 'Keep Learning!';
   };
 
+  // Helper: display user answer correctly depending on type
+  const renderUserAnswer = (result) => {
+    if (result.type === 'mcq') {
+      return result.options?.[result.userAnswer] ?? 'No answer';
+    }
+    if (result.type === 'true_false') {
+      return result.userAnswer === true ? 'True' : 'False';
+    }
+    if (result.type === 'open') {
+      return result.userAnswer || 'No response';
+    }
+    return 'N/A';
+  };
+
+  // Helper: display correct answer properly
+  const renderCorrectAnswer = (result) => {
+    if (result.type === 'mcq') {
+      return result.options?.[result.correctAnswer] ?? 'N/A';
+    }
+    if (result.type === 'true_false') {
+      return result.correctAnswer ? 'True' : 'False';
+    }
+    if (result.type === 'open') {
+      return result.correctAnswer?.join(', ') ?? 'N/A';
+    }
+    return 'N/A';
+  };
+
   return (
     <div className={styles.container}>
+      {/* --- Score Summary --- */}
       <motion.div
         className={styles.scoreCard}
         initial={{ opacity: 0, scale: 0.9 }}
@@ -68,6 +97,7 @@ export default function QuizResults({ results, onRestart }) {
           </div>
         </div>
 
+        {/* --- Stats --- */}
         <div className={styles.stats}>
           <div className={styles.stat}>
             <Award className={styles.statIcon} />
@@ -94,6 +124,7 @@ export default function QuizResults({ results, onRestart }) {
           </div>
         </div>
 
+        {/* --- Actions --- */}
         <div className={styles.actions}>
           <motion.button
             className={styles.detailsButton}
@@ -117,6 +148,7 @@ export default function QuizResults({ results, onRestart }) {
         </div>
       </motion.div>
 
+      {/* --- Detailed Results --- */}
       {showDetails && (
         <motion.div
           className={styles.detailsSection}
@@ -159,7 +191,7 @@ export default function QuizResults({ results, onRestart }) {
                       <div className={styles.answer}>
                         <strong>Your answer:</strong>{' '}
                         <span className={result.isCorrect ? styles.correctText : styles.incorrectText}>
-                          {result.options[result.userAnswer]}
+                          {renderUserAnswer(result)}
                         </span>
                       </div>
 
@@ -167,7 +199,7 @@ export default function QuizResults({ results, onRestart }) {
                         <div className={styles.answer}>
                           <strong>Correct answer:</strong>{' '}
                           <span className={styles.correctText}>
-                            {result.options[result.correctAnswer]}
+                            {renderCorrectAnswer(result)}
                           </span>
                         </div>
                       )}
@@ -184,6 +216,7 @@ export default function QuizResults({ results, onRestart }) {
         </motion.div>
       )}
 
+      {/* --- Leaderboard --- */}
       {leaderboard.length > 0 && (
         <motion.div
           className={styles.leaderboard}
@@ -208,7 +241,7 @@ export default function QuizResults({ results, onRestart }) {
                     {entry.config?.topic?.replace('-', ' ') || 'Random Quiz'}
                   </span>
                   <span className={styles.leaderboardDifficulty}>
-                    {entry.config.difficulty}
+                    {entry.config?.difficulty || '—'}
                   </span>
                 </div>
                 <span className={styles.leaderboardScore}>{entry.percentage}%</span>
