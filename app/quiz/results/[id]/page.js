@@ -344,14 +344,14 @@ export default function QuizResultsPage({ params }) {
                       result.is_correct ? styles.answerCorrect : styles.answerIncorrect
                     }`}
                   >
-                    "{result.your_answer}"
+                    &quot;{result.your_answer}&quot;
                   </div>
 
                   {!result.is_correct && (
                     <>
                       <p className={styles.answerLabel}>Correct Answer:</p>
                       <div className={`${styles.answerText} ${styles.answerCorrect}`}>
-                        "{result.correct_answer}"
+                        &quot;{result.correct_answer}&quot;
                       </div>
                     </>
                   )}

@@ -7,7 +7,7 @@
 
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 type Report = {
@@ -37,7 +37,7 @@ async function startTrace(seconds = 10, filter = 'tcp port 3000') {
   return pcap;
 }
 
-export default function WiresharkPage() {
+function WiresharkContent() {
   const sp = useSearchParams();
   const initialFromQS = sp.get('pcap');
   const [pcap, setPcap] = useState<string>(initialFromQS || '');
@@ -162,5 +162,13 @@ export default function WiresharkPage() {
         </>
       )}
     </div>
+  );
+}
+
+export default function WiresharkPage() {
+  return (
+    <Suspense fallback={<div style={{padding:'2rem', textAlign:'center'}}>Loading...</div>}>
+      <WiresharkContent />
+    </Suspense>
   );
 }

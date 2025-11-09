@@ -66,7 +66,7 @@ export default function QuizSetup({ onStart }) {
           <Sparkles className={styles.titleIcon} />
           Quiz Setup
         </h1>
-        <p className={styles.subtitle}>Let's configure your quiz experience</p>
+        <p className={styles.subtitle}>Let&apos;s configure your quiz experience</p>
       </div>
 
       <div className={styles.chatContainer}>
