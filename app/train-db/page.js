@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { uploadDocument, uploadDocumentBatch, getJobStatus } from "@/lib/api";
+import { uploadDocument, uploadDocumentBatch, getJobStatus } from "../../lib/api";
 import { Upload, FileText, Check, X, Loader2, Trash2 } from "lucide-react";
 
 export default function TrainDBPage() {

@@ -316,14 +316,14 @@ export default function AttemptDetailPage({ params }) {
                       result.is_correct ? styles.answerCorrect : styles.answerIncorrect
                     }`}
                   >
-                    "{result.your_answer || '(No answer provided)'}"
+                    &quot;{result.your_answer || '(No answer provided)'}&quot;
                   </div>
 
                   {!result.is_correct && (
                     <>
                       <p className={styles.answerLabel}>Correct Answer:</p>
                       <div className={`${styles.answerText} ${styles.answerCorrect}`}>
-                        "{result.correct_answer}"
+                        &quot;{result.correct_answer}&quot;
                       </div>
                     </>
                   )}

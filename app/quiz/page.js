@@ -1,8 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { listQuizzes } from '@/lib/api';
 import { Plus, Clock, BookOpen, TrendingUp } from 'lucide-react';
+import { listQuizzes } from '../../lib/api';
 
 async function startTrace(seconds = 10, filter = 'tcp port 3000') {
   const r = await fetch('/api/trace/start', {

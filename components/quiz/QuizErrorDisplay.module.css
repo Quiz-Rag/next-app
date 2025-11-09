@@ -1,0 +1,215 @@
+.errorContainer {
+  margin: 2rem 0;
+}
+
+.errorBox {
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.errorWarning {
+  background: rgba(251, 191, 36, 0.1);
+  border-color: rgba(251, 191, 36, 0.3);
+}
+
+.errorInfo {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.errorDanger {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.errorHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.errorIcon {
+  flex-shrink: 0;
+}
+
+.errorWarning .errorIcon {
+  color: #f59e0b;
+}
+
+.errorInfo .errorIcon {
+  color: #3b82f6;
+}
+
+.errorDanger .errorIcon {
+  color: #ef4444;
+}
+
+.errorTitle {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.errorMessage {
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.errorHint {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+/* Progress Bar */
+.progressSection {
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.progressHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.progressLabel {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.progressValue {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #3b82f6;
+}
+
+.progressBar {
+  width: 100%;
+  height: 8px;
+  background: rgba(59, 130, 246, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+  transition: width 0.3s ease;
+}
+
+/* Examples Box */
+.examplesBox {
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.examplesTitle {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+}
+
+.examplesList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.examplesList li {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  padding: 0.5rem 0;
+  padding-left: 1.25rem;
+  position: relative;
+  line-height: 1.5;
+}
+
+.examplesList li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: var(--accent-primary);
+  font-weight: bold;
+}
+
+/* Buttons */
+.buttonGroup {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.primaryButton,
+.secondaryButton,
+.retryButton {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.primaryButton {
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  color: white;
+  box-shadow: 0 2px 8px rgba(6, 182, 212, 0.3);
+}
+
+.primaryButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.4);
+}
+
+.secondaryButton {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.secondaryButton:hover {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+.retryButton {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.retryButton:hover {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .buttonGroup {
+    flex-direction: column;
+  }
+
+  .primaryButton,
+  .secondaryButton,
+  .retryButton {
+    width: 100%;
+    justify-content: center;
+  }
+}
