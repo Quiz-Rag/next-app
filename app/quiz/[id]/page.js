@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { getQuiz, submitQuiz } from "@/lib/api";
 import { useRouter } from "next/navigation";
+import { Clock, CheckCircle, Edit3, MessageSquare, Trophy, Loader2 } from "lucide-react";
+import styles from "./QuizAttempt.module.css";
 
 export default function QuizAttemptPage({ params }) {
   const router = useRouter();
@@ -140,10 +142,10 @@ export default function QuizAttemptPage({ params }) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading quiz...</p>
+      <div className={styles.container}>
+        <div className={styles.loading}>
+          <div className={styles.spinner}></div>
+          <p>Loading quiz...</p>
         </div>
       </div>
     );
@@ -151,49 +153,48 @@ export default function QuizAttemptPage({ params }) {
 
   if (error && !quiz) {
     return (
-      <div className="flex items-center justify-center min-h-screen p-10">
-        <div className="max-w-md w-full p-6 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-800 font-semibold mb-2">Error Loading Quiz</p>
-          <p className="text-red-700">{error}</p>
-          <button
-            onClick={() => router.push("/quiz/generate")}
-            className="mt-4 w-full bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700"
-          >
-            Back to Quiz Generator
-          </button>
+      <div className={styles.container}>
+        <div className={styles.error}>
+          <div className={styles.errorBox}>
+            <p className={styles.errorTitle}>Error Loading Quiz</p>
+            <p className={styles.errorText}>{error}</p>
+            <button
+              onClick={() => router.push("/quiz/generate")}
+              className={styles.errorButton}
+            >
+              Back to Quiz Generator
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen p-6 md:p-10">
-      <div className="max-w-4xl mx-auto">
+    <div className={styles.container}>
+      {/* Sticky Timer - Always Visible */}
+      <div className={styles.stickyTimer}>
+        <Clock size={20} />
+        <span>{formatTime(elapsedTime)}</span>
+      </div>
+
+      <div className={styles.content}>
         {/* Header */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg mb-6">
-          <div className="flex items-center justify-between mb-3">
-            <h1 className="text-3xl font-bold">{quiz.topic}</h1>
-            {/* Timer Display */}
-            <div className="text-right">
-              <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Time Elapsed</div>
-              <div className="text-2xl font-bold text-blue-600 dark:text-blue-400 font-mono">
-                {formatTime(elapsedTime)}
-              </div>
-            </div>
+        <div className={styles.header}>
+          <div className={styles.headerTop}>
+            <h1 className={styles.title}>{quiz.topic}</h1>
           </div>
-          <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400">
-            <div className="flex items-center">
-              <span className="font-semibold mr-2">Total Questions:</span>
+          <div className={styles.metaInfo}>
+            <div className={styles.metaItem}>
+              <span className={styles.metaLabel}>Total Questions:</span>
               <span>{quiz.total_questions}</span>
             </div>
-            <div className="flex items-center">
-              <span className="font-semibold mr-2">Difficulty:</span>
-              <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded capitalize">
-                {quiz.difficulty}
-              </span>
+            <div className={styles.metaItem}>
+              <span className={styles.metaLabel}>Difficulty:</span>
+              <span className={styles.difficultyBadge}>{quiz.difficulty}</span>
             </div>
-            <div className="flex items-center">
-              <span className="font-semibold mr-2">Types:</span>
+            <div className={styles.metaItem}>
+              <span className={styles.metaLabel}>Types:</span>
               <span>MCQ: {quiz.num_mcq} | Blanks: {quiz.num_blanks} | Descriptive: {quiz.num_descriptive}</span>
             </div>
           </div>
@@ -201,24 +202,25 @@ export default function QuizAttemptPage({ params }) {
 
         {/* MCQ Questions */}
         {quiz.mcq_questions.length > 0 && (
-          <div className="mb-6">
-            <h2 className="text-xl font-semibold mb-4 text-blue-600 dark:text-blue-400">
+          <div className={styles.section}>
+            <h2 className={`${styles.sectionTitle} ${styles.sectionTitleMCQ}`}>
+              <CheckCircle size={24} />
               Multiple Choice Questions
             </h2>
             {quiz.mcq_questions.map((q, idx) => (
-              <div key={q.question_id} className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow mb-4">
-                <p className="font-medium mb-4 text-lg">
-                  <span className="text-blue-600 dark:text-blue-400 mr-2">{idx + 1}.</span>
+              <div key={q.question_id} className={styles.questionCard}>
+                <p className={styles.questionText}>
+                  <span className={`${styles.questionNumber} ${styles.questionNumberMCQ}`}>
+                    {idx + 1}.
+                  </span>
                   {q.question}
                 </p>
-                <div className="space-y-2 ml-6">
+                <div className={styles.optionsContainer}>
                   {q.options.map((opt) => (
                     <label
                       key={opt.option_id}
-                      className={`flex items-start space-x-3 p-3 rounded cursor-pointer transition-colors ${
-                        mcqAnswers[q.question_id] === opt.option_id
-                          ? "bg-blue-50 dark:bg-blue-900/30 border-2 border-blue-500"
-                          : "hover:bg-gray-50 dark:hover:bg-gray-700/50 border-2 border-transparent"
+                      className={`${styles.option} ${
+                        mcqAnswers[q.question_id] === opt.option_id ? styles.optionSelected : ''
                       }`}
                     >
                       <input
@@ -227,9 +229,9 @@ export default function QuizAttemptPage({ params }) {
                         value={opt.option_id}
                         checked={mcqAnswers[q.question_id] === opt.option_id}
                         onChange={() => handleMCQAnswer(q.question_id, opt.option_id)}
-                        className="w-4 h-4 mt-1 text-blue-600"
+                        className={styles.optionRadio}
                       />
-                      <span className="flex-1">{opt.text}</span>
+                      <span className={styles.optionText}>{opt.text}</span>
                     </label>
                   ))}
                 </div>
@@ -240,14 +242,15 @@ export default function QuizAttemptPage({ params }) {
 
         {/* Blank Questions */}
         {quiz.blank_questions.length > 0 && (
-          <div className="mb-6">
-            <h2 className="text-xl font-semibold mb-4 text-green-600 dark:text-green-400">
+          <div className={styles.section}>
+            <h2 className={`${styles.sectionTitle} ${styles.sectionTitleBlanks}`}>
+              <Edit3 size={24} />
               Fill in the Blanks
             </h2>
             {quiz.blank_questions.map((q, idx) => (
-              <div key={q.question_id} className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow mb-4">
-                <p className="font-medium mb-3 text-lg">
-                  <span className="text-green-600 dark:text-green-400 mr-2">
+              <div key={q.question_id} className={styles.questionCard}>
+                <p className={styles.questionText}>
+                  <span className={`${styles.questionNumber} ${styles.questionNumberBlanks}`}>
                     {quiz.num_mcq + idx + 1}.
                   </span>
                   {q.question}
@@ -257,7 +260,7 @@ export default function QuizAttemptPage({ params }) {
                   value={blankAnswers[q.question_id] || ""}
                   onChange={(e) => handleBlankAnswer(q.question_id, e.target.value)}
                   placeholder="Type your answer here"
-                  className="w-full border-2 border-gray-300 dark:border-gray-600 rounded p-3 dark:bg-gray-700 focus:border-green-500 focus:ring-2 focus:ring-green-200 dark:focus:ring-green-800 outline-none"
+                  className={styles.inputText}
                 />
               </div>
             ))}
@@ -266,14 +269,15 @@ export default function QuizAttemptPage({ params }) {
 
         {/* Descriptive Questions */}
         {quiz.descriptive_questions.length > 0 && (
-          <div className="mb-6">
-            <h2 className="text-xl font-semibold mb-4 text-purple-600 dark:text-purple-400">
+          <div className={styles.section}>
+            <h2 className={`${styles.sectionTitle} ${styles.sectionTitleDescriptive}`}>
+              <MessageSquare size={24} />
               Descriptive Questions
             </h2>
             {quiz.descriptive_questions.map((q, idx) => (
-              <div key={q.question_id} className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow mb-4">
-                <p className="font-medium mb-3 text-lg">
-                  <span className="text-purple-600 dark:text-purple-400 mr-2">
+              <div key={q.question_id} className={styles.questionCard}>
+                <p className={styles.questionText}>
+                  <span className={`${styles.questionNumber} ${styles.questionNumberDescriptive}`}>
                     {quiz.num_mcq + quiz.num_blanks + idx + 1}.
                   </span>
                   {q.question}
@@ -282,8 +286,7 @@ export default function QuizAttemptPage({ params }) {
                   value={descriptiveAnswers[q.question_id] || ""}
                   onChange={(e) => handleDescriptiveAnswer(q.question_id, e.target.value)}
                   placeholder="Write your detailed answer here..."
-                  rows="6"
-                  className="w-full border-2 border-gray-300 dark:border-gray-600 rounded p-3 dark:bg-gray-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-800 outline-none resize-y"
+                  className={styles.textareaInput}
                 />
               </div>
             ))}
@@ -292,29 +295,29 @@ export default function QuizAttemptPage({ params }) {
 
         {/* Error Message */}
         {error && (
-          <div className="p-4 bg-red-50 border border-red-200 text-red-800 rounded-lg mb-4">
-            <p className="font-semibold">Error:</p>
+          <div className={styles.errorMessage}>
+            <p className={styles.errorMessageTitle}>Error:</p>
             <p>{error}</p>
           </div>
         )}
 
         {/* Submit Button */}
-        <div className="sticky bottom-4 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg border-2 border-gray-200 dark:border-gray-700">
+        <div className={styles.submitSection}>
           <button
             onClick={handleSubmit}
             disabled={submitting}
-            className="w-full bg-gradient-to-r from-green-600 to-blue-600 text-white py-3 px-4 rounded-lg hover:from-green-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-lg transition-all transform hover:scale-105"
+            className={styles.submitButton}
           >
             {submitting ? (
-              <span className="flex items-center justify-center">
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
+              <>
+                <Loader2 size={24} className={styles.submittingSpinner} />
                 Submitting Quiz...
-              </span>
+              </>
             ) : (
-              "Submit Quiz"
+              <>
+                <Trophy size={24} className={styles.submitButtonIcon} />
+                Submit Quiz
+              </>
             )}
           </button>
         </div>

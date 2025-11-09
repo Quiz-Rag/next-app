@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { getQuiz, getQuizAttempts, getQuizAnalytics } from "@/lib/api";
 import { useRouter } from "next/navigation";
-import { TrendingUp, Clock, Users, Award, BarChart3 } from "lucide-react";
+import { BarChart3, Clock, Trophy, Target, TrendingUp, Calendar, User } from "lucide-react";
+import styles from "./QuizHistory.module.css";
 
 export default function QuizHistoryPage({ params }) {
   const router = useRouter();
@@ -37,29 +38,37 @@ export default function QuizHistoryPage({ params }) {
     fetchData();
   }, [quizId]);
 
-  const formatTime = (seconds) => {
-    if (!seconds) return 'N/A';
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}m ${secs}s`;
-  };
-
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
+  };
+
+  const formatTime = (seconds) => {
+    if (!seconds) return "N/A";
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  const getScoreColor = (percentage) => {
+    if (percentage >= 80) return styles.scoreExcellent;
+    if (percentage >= 60) return styles.scoreGood;
+    if (percentage >= 40) return styles.scoreFair;
+    return styles.scorePoor;
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading history...</p>
+      <div className={styles.container}>
+        <div className={styles.loading}>
+          <div className={styles.spinner}></div>
+          <p>Loading history...</p>
         </div>
       </div>
     );
@@ -67,15 +76,11 @@ export default function QuizHistoryPage({ params }) {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen p-10">
-        <div className="max-w-md w-full p-6 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-800 font-semibold mb-2">Error</p>
-          <p className="text-red-700">{error}</p>
-          <button
-            onClick={() => router.push(`/quiz/${quizId}`)}
-            className="mt-4 w-full bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700"
-          >
-            Back to Quiz
+      <div className={styles.container}>
+        <div className={styles.error}>
+          <p>{error}</p>
+          <button onClick={() => router.push("/quiz")} className={styles.backButton}>
+            Back to Quizzes
           </button>
         </div>
       </div>
@@ -83,134 +88,133 @@ export default function QuizHistoryPage({ params }) {
   }
 
   return (
-    <div className="min-h-screen p-6 md:p-10">
-      <div className="max-w-6xl mx-auto">
+    <div className={styles.container}>
+      <div className={styles.content}>
         {/* Header */}
-        <div className="mb-6">
-          <button
-            onClick={() => router.push(`/quiz/${quizId}`)}
-            className="text-blue-600 hover:text-blue-800 mb-4 flex items-center"
-          >
-            ← Back to Quiz
+        <div className={styles.header}>
+          <button onClick={() => router.push("/quiz")} className={styles.backBtn}>
+            ← Back
           </button>
-          <h1 className="text-3xl font-bold mb-2">{quiz.topic} - History & Analytics</h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            View all attempts and performance statistics for this quiz
-          </p>
+          <div>
+            <h1 className={styles.title}>{quiz?.topic || "Quiz"} - History</h1>
+            <p className={styles.subtitle}>
+              {analytics?.total_attempts || 0} total attempts
+            </p>
+          </div>
         </div>
 
-        {/* Analytics Summary Cards */}
+        {/* Analytics Cards */}
         {analytics && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-400">Total Attempts</h3>
-                <Users className="w-5 h-5 text-blue-600" />
+          <div className={styles.analyticsGrid}>
+            <div className={styles.analyticsCard}>
+              <div className={styles.cardIcon}>
+                <BarChart3 size={24} />
               </div>
-              <p className="text-3xl font-bold">{analytics.total_attempts}</p>
+              <div className={styles.cardContent}>
+                <p className={styles.cardLabel}>Total Attempts</p>
+                <p className={styles.cardValue}>{analytics.total_attempts}</p>
+              </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-400">Average Score</h3>
-                <TrendingUp className="w-5 h-5 text-green-600" />
+            <div className={styles.analyticsCard}>
+              <div className={styles.cardIcon}>
+                <TrendingUp size={24} />
               </div>
-              <p className="text-3xl font-bold">{analytics.average_score.toFixed(1)}%</p>
+              <div className={styles.cardContent}>
+                <p className={styles.cardLabel}>Average Score</p>
+                <p className={styles.cardValue}>{analytics.average_score.toFixed(1)}%</p>
+              </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-400">Highest Score</h3>
-                <Award className="w-5 h-5 text-yellow-600" />
+            <div className={styles.analyticsCard}>
+              <div className={styles.cardIcon}>
+                <Trophy size={24} />
               </div>
-              <p className="text-3xl font-bold">{analytics.highest_score.toFixed(1)}%</p>
+              <div className={styles.cardContent}>
+                <p className={styles.cardLabel}>Highest Score</p>
+                <p className={styles.cardValue}>{analytics.highest_score.toFixed(1)}%</p>
+              </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-400">Avg Time</h3>
-                <Clock className="w-5 h-5 text-purple-600" />
+            <div className={styles.analyticsCard}>
+              <div className={styles.cardIcon}>
+                <Clock size={24} />
               </div>
-              <p className="text-3xl font-bold">{formatTime(analytics.average_time_seconds)}</p>
+              <div className={styles.cardContent}>
+                <p className={styles.cardLabel}>Avg Time</p>
+                <p className={styles.cardValue}>
+                  {formatTime(Math.round(analytics.average_time_seconds))}
+                </p>
+              </div>
             </div>
           </div>
         )}
 
-        {/* Attempts List */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
-          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-xl font-bold flex items-center">
-              <BarChart3 className="w-5 h-5 mr-2" />
-              All Attempts ({attempts.length})
-            </h2>
-          </div>
+        {/* Attempts Table */}
+        <div className={styles.tableSection}>
+          <h2 className={styles.sectionTitle}>
+            <Target size={20} />
+            All Attempts
+          </h2>
 
           {attempts.length === 0 ? (
-            <div className="p-8 text-center text-gray-500">
+            <div className={styles.emptyState}>
               <p>No attempts yet. Be the first to take this quiz!</p>
+              <button
+                onClick={() => router.push(`/quiz/${quizId}`)}
+                className={styles.takeQuizButton}
+              >
+                Take Quiz Now
+              </button>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50 dark:bg-gray-700">
+            <div className={styles.tableWrapper}>
+              <table className={styles.table}>
+                <thead>
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                      Attempt #
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                      User
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                      Score
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                      Time
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                      Submitted
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                      Status
-                    </th>
+                    <th>Attempt</th>
+                    <th>User</th>
+                    <th>Score</th>
+                    <th>Time</th>
+                    <th>Date</th>
+                    <th>Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                  {attempts.map((attempt) => (
+                <tbody>
+                  {attempts.map((attempt, index) => (
                     <tr
                       key={attempt.attempt_id}
-                      className="hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
                       onClick={() => router.push(`/quiz/attempt/${attempt.attempt_id}`)}
+                      className={styles.tableRow}
                     >
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        #{attempt.attempt_id}
+                      <td>
+                        <div className={styles.attemptBadge}>#{attempts.length - index}</div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        {attempt.user_name || attempt.user_id || 'Anonymous'}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        <div className="flex items-center">
-                          <span className="font-semibold mr-2">{attempt.percentage.toFixed(1)}%</span>
-                          <span className="text-gray-500">
-                            ({attempt.total_score}/{attempt.max_score})
-                          </span>
+                      <td>
+                        <div className={styles.userInfo}>
+                          <User size={16} />
+                          {attempt.user_name || attempt.user_id || "Anonymous"}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        {formatTime(attempt.time_taken_seconds)}
+                      <td>
+                        <div className={`${styles.scoreCell} ${getScoreColor(attempt.percentage)}`}>
+                          {attempt.percentage.toFixed(1)}%
+                        </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {formatDate(attempt.submitted_at)}
+                      <td>
+                        <div className={styles.timeCell}>
+                          <Clock size={14} />
+                          {formatTime(attempt.time_taken_seconds)}
+                        </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                            attempt.percentage >= 60
-                              ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                              : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                          }`}
-                        >
-                          {attempt.percentage >= 60 ? 'Passed' : 'Failed'}
-                        </span>
+                      <td>
+                        <div className={styles.dateCell}>
+                          <Calendar size={14} />
+                          {formatDate(attempt.submitted_at)}
+                        </div>
+                      </td>
+                      <td>
+                        <button className={styles.viewButton}>View →</button>
                       </td>
                     </tr>
                   ))}
@@ -220,19 +224,14 @@ export default function QuizHistoryPage({ params }) {
           )}
         </div>
 
-        {/* Actions */}
-        <div className="mt-6 flex gap-4">
+        {/* Retake Button */}
+        <div className={styles.actions}>
           <button
             onClick={() => router.push(`/quiz/${quizId}`)}
-            className="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 font-semibold transition-colors"
+            className={styles.retakeButton}
           >
-            Take Quiz
-          </button>
-          <button
-            onClick={() => router.push("/quiz/generate")}
-            className="bg-gray-600 text-white py-2 px-6 rounded-lg hover:bg-gray-700 font-semibold transition-colors"
-          >
-            Generate New Quiz
+            <Trophy size={20} />
+            Take Quiz Again
           </button>
         </div>
       </div>

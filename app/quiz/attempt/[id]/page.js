@@ -3,6 +3,22 @@
 import React, { useState, useEffect } from "react";
 import { getAttemptDetail } from "@/lib/api";
 import { useRouter } from "next/navigation";
+import {
+  Trophy,
+  TrendingUp,
+  BarChart,
+  XCircle,
+  Clock,
+  Calendar,
+  Hash,
+  User,
+  CheckCircle,
+  AlertCircle,
+  Lightbulb,
+  RotateCcw,
+  BarChart3,
+} from "lucide-react";
+import styles from "./AttemptDetail.module.css";
 
 export default function AttemptDetailPage({ params }) {
   const router = useRouter();
@@ -28,181 +44,371 @@ export default function AttemptDetailPage({ params }) {
   }, [attemptId]);
 
   const formatTime = (seconds) => {
-    if (!seconds) return 'N/A';
+    if (!seconds) return "N/A";
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins}m ${secs}s`;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
+  };
+
+  const getScoreData = (percentage) => {
+    if (percentage >= 80)
+      return {
+        icon: <Trophy size={64} className={styles.iconExcellent} />,
+        class: styles.scoreExcellent,
+        feedback: "Excellent Work!",
+        feedbackClass: styles.feedbackExcellent,
+      };
+    if (percentage >= 60)
+      return {
+        icon: <TrendingUp size={64} className={styles.iconGood} />,
+        class: styles.scoreGood,
+        feedback: "Good Job!",
+        feedbackClass: styles.feedbackGood,
+      };
+    if (percentage >= 40)
+      return {
+        icon: <BarChart size={64} className={styles.iconFair} />,
+        class: styles.scoreFair,
+        feedback: "Keep Practicing!",
+        feedbackClass: styles.feedbackFair,
+      };
+    return {
+      icon: <XCircle size={64} className={styles.iconPoor} />,
+      class: styles.scorePoor,
+      feedback: "Needs Improvement",
+      feedbackClass: styles.feedbackPoor,
+    };
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading attempt...</p>
+      <div className={styles.container}>
+        <div className={styles.loading}>
+          <div className={styles.spinner}></div>
+          <p>Loading attempt details...</p>
         </div>
       </div>
     );
   }
 
-  if (error) {
+  if (error || !attempt) {
     return (
-      <div className="flex items-center justify-center min-h-screen p-10">
-        <div className="max-w-md w-full p-6 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-800 font-semibold mb-2">Error</p>
-          <p className="text-red-700">{error}</p>
-          <button
-            onClick={() => router.back()}
-            className="mt-4 w-full bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700"
-          >
-            Go Back
+      <div className={styles.container}>
+        <div className={styles.error}>
+          <XCircle size={48} />
+          <p>{error || "Attempt not found"}</p>
+          <button onClick={() => router.push("/quiz")} className={styles.backButton}>
+            Back to Quizzes
           </button>
         </div>
       </div>
     );
   }
 
-  const isPassing = attempt.percentage >= 60;
+  const scoreData = getScoreData(attempt.percentage);
 
   return (
-    <div className="min-h-screen p-6 md:p-10">
-      <div className="max-w-5xl mx-auto">
+    <div className={styles.container}>
+      <div className={styles.content}>
         {/* Header */}
-        <button
-          onClick={() => router.push(`/quiz/${attempt.quiz_id}/history`)}
-          className="text-blue-600 hover:text-blue-800 mb-4 flex items-center"
-        >
-          ← Back to History
-        </button>
-
-        {/* Attempt Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-8 rounded-lg shadow-xl mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-3xl font-bold">Attempt #{attempt.attempt_id}</h1>
-            <div className={`px-4 py-2 rounded-full text-sm font-semibold ${
-              isPassing ? "bg-green-500" : "bg-red-500"
-            }`}>
-              {isPassing ? "✓ PASSED" : "✗ FAILED"}
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <p className="text-xl mb-2">{attempt.topic}</p>
-              <p className="text-blue-100 text-sm">By: {attempt.user_name || attempt.user_id || 'Anonymous'}</p>
-              <p className="text-blue-100 text-sm">Submitted: {formatDate(attempt.submitted_at)}</p>
-              {attempt.time_taken_seconds && (
-                <p className="text-blue-100 text-sm">Time: {formatTime(attempt.time_taken_seconds)}</p>
-              )}
-            </div>
-            <div className="text-right">
-              <div className="text-6xl font-bold mb-2">{attempt.percentage.toFixed(1)}%</div>
-              <div className="text-xl">{attempt.total_score} / {attempt.max_score} points</div>
-            </div>
+        <div className={styles.header}>
+          <button
+            onClick={() => router.push(`/quiz/${attempt.quiz_id}/history`)}
+            className={styles.backBtn}
+          >
+            ← Back to History
+          </button>
+          <div className={styles.headerContent}>
+            <h1 className={styles.title}>Attempt #{attempt.attempt_id}</h1>
+            <p className={styles.subtitle}>{attempt.topic}</p>
           </div>
         </div>
 
-        {/* Score Breakdown */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-            <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Multiple Choice</div>
-            <div className="text-2xl font-bold text-blue-600">
-              {attempt.mcq_score} / {attempt.mcq_results.length}
-            </div>
+        {/* Score Card */}
+        <div className={styles.scoreCard}>
+          <div className={styles.scoreIcon}>{scoreData.icon}</div>
+          <p className={styles.scoreLabel}>Final Score</p>
+          <div className={`${styles.scoreValue} ${scoreData.class}`}>
+            {attempt.percentage.toFixed(1)}%
           </div>
-          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-            <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Fill in Blanks</div>
-            <div className="text-2xl font-bold text-green-600">
-              {attempt.blank_score} / {attempt.blank_results.length}
-            </div>
-          </div>
-          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-            <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Descriptive</div>
-            <div className="text-2xl font-bold text-purple-600">Manual Review</div>
+          <p className={`${styles.scoreFeedback} ${scoreData.feedbackClass}`}>
+            {scoreData.feedback}
+          </p>
+          <div className={styles.scoreBreakdown}>
+            {attempt.total_score} / {attempt.max_score} points
           </div>
         </div>
 
-        {/* Detailed Results - reuse same structure as results page */}
+        {/* Metadata */}
+        <div className={styles.metadata}>
+          <div className={styles.metadataCard}>
+            <div className={styles.metadataIcon}>
+              <Hash size={20} />
+            </div>
+            <div className={styles.metadataContent}>
+              <p className={styles.metadataLabel}>Attempt ID</p>
+              <p className={styles.metadataValue}>#{attempt.attempt_id}</p>
+            </div>
+          </div>
+
+          <div className={styles.metadataCard}>
+            <div className={styles.metadataIcon}>
+              <Clock size={20} />
+            </div>
+            <div className={styles.metadataContent}>
+              <p className={styles.metadataLabel}>Time Taken</p>
+              <p className={styles.metadataValue}>
+                {formatTime(attempt.time_taken_seconds)}
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.metadataCard}>
+            <div className={styles.metadataIcon}>
+              <Calendar size={20} />
+            </div>
+            <div className={styles.metadataContent}>
+              <p className={styles.metadataLabel}>Submitted</p>
+              <p className={styles.metadataValue}>{formatDate(attempt.submitted_at)}</p>
+            </div>
+          </div>
+
+          {attempt.user_name && (
+            <div className={styles.metadataCard}>
+              <div className={styles.metadataIcon}>
+                <User size={20} />
+              </div>
+              <div className={styles.metadataContent}>
+                <p className={styles.metadataLabel}>User</p>
+                <p className={styles.metadataValue}>{attempt.user_name}</p>
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* MCQ Results */}
-        {attempt.mcq_results.length > 0 && (
-          <div className="mb-6">
-            <h2 className="text-2xl font-semibold mb-4">Multiple Choice Results</h2>
+        {attempt.mcq_results && attempt.mcq_results.length > 0 && (
+          <div className={styles.questionsSection}>
+            <h2 className={styles.sectionTitle}>
+              <CheckCircle size={24} />
+              Multiple Choice Questions
+            </h2>
             {attempt.mcq_results.map((result, idx) => (
               <div
                 key={result.question_id}
-                className={`bg-white dark:bg-gray-800 p-6 rounded-lg shadow mb-4 border-l-4 ${
-                  result.is_correct ? "border-green-500" : "border-red-500"
+                className={`${styles.questionCard} ${
+                  result.is_correct ? styles.questionCardCorrect : styles.questionCardIncorrect
                 }`}
               >
-                <div className="flex items-start justify-between mb-3">
-                  <p className="font-medium text-lg flex-1">
-                    <span className="text-gray-500 mr-2">{idx + 1}.</span>
+                <div className={styles.questionHeader}>
+                  <p className={styles.questionNumber}>
+                    <span className={styles.questionNumberSpan}>{idx + 1}.</span>
                     {result.question}
                   </p>
-                  {result.is_correct ? (
-                    <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold">
-                      ✓ Correct
-                    </span>
-                  ) : (
-                    <span className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-semibold">
-                      ✗ Wrong
-                    </span>
-                  )}
+                  <div
+                    className={`${styles.questionStatus} ${
+                      result.is_correct ? styles.statusCorrect : styles.statusIncorrect
+                    }`}
+                  >
+                    {result.is_correct ? (
+                      <>
+                        <CheckCircle size={16} />
+                        Correct
+                      </>
+                    ) : (
+                      <>
+                        <XCircle size={16} />
+                        Wrong
+                      </>
+                    )}
+                  </div>
                 </div>
 
-                <div className="ml-6 space-y-2">
-                  <div>
-                    <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Your Answer:</span>
-                    <p className={`mt-1 ${result.is_correct ? "text-green-700 dark:text-green-400" : "text-red-700 dark:text-red-400"}`}>
-                      {result.your_answer_text}
-                    </p>
+                <div className={styles.answerSection}>
+                  <p className={styles.answerLabel}>Your Answer:</p>
+                  <div
+                    className={`${styles.answerText} ${
+                      result.is_correct ? styles.answerCorrect : styles.answerIncorrect
+                    }`}
+                  >
+                    {result.your_answer_text}
                   </div>
 
                   {!result.is_correct && (
-                    <div>
-                      <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Correct Answer:</span>
-                      <p className="mt-1 text-green-700 dark:text-green-400">
+                    <>
+                      <p className={styles.answerLabel}>Correct Answer:</p>
+                      <div className={`${styles.answerText} ${styles.answerCorrect}`}>
                         {result.correct_answer_text}
-                      </p>
-                    </div>
+                      </div>
+                    </>
                   )}
 
-                  <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded">
-                    <span className="text-sm font-semibold text-blue-800 dark:text-blue-300">Explanation:</span>
-                    <p className="mt-1 text-sm text-blue-900 dark:text-blue-200">{result.explanation}</p>
-                  </div>
+                  {result.explanation && (
+                    <div className={styles.explanation}>
+                      <p className={styles.explanationLabel}>
+                        <Lightbulb size={16} />
+                        Explanation
+                      </p>
+                      <p className={styles.explanationText}>{result.explanation}</p>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
           </div>
         )}
 
-        {/* Similar structure for blank and descriptive results... */}
-        
+        {/* Blank Results */}
+        {attempt.blank_results && attempt.blank_results.length > 0 && (
+          <div className={styles.questionsSection}>
+            <h2 className={styles.sectionTitle}>
+              <AlertCircle size={24} />
+              Fill in the Blanks
+            </h2>
+            {attempt.blank_results.map((result, idx) => (
+              <div
+                key={result.question_id}
+                className={`${styles.questionCard} ${
+                  result.is_correct ? styles.questionCardCorrect : styles.questionCardIncorrect
+                }`}
+              >
+                <div className={styles.questionHeader}>
+                  <p className={styles.questionNumber}>
+                    <span className={styles.questionNumberSpan}>
+                      {(attempt.mcq_results?.length || 0) + idx + 1}.
+                    </span>
+                    {result.question}
+                  </p>
+                  <div
+                    className={`${styles.questionStatus} ${
+                      result.is_correct ? styles.statusCorrect : styles.statusIncorrect
+                    }`}
+                  >
+                    {result.is_correct ? (
+                      <>
+                        <CheckCircle size={16} />
+                        Correct
+                      </>
+                    ) : (
+                      <>
+                        <XCircle size={16} />
+                        Wrong
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                <div className={styles.answerSection}>
+                  <p className={styles.answerLabel}>Your Answer:</p>
+                  <div
+                    className={`${styles.answerText} ${
+                      result.is_correct ? styles.answerCorrect : styles.answerIncorrect
+                    }`}
+                  >
+                    "{result.your_answer || '(No answer provided)'}"
+                  </div>
+
+                  {!result.is_correct && (
+                    <>
+                      <p className={styles.answerLabel}>Correct Answer:</p>
+                      <div className={`${styles.answerText} ${styles.answerCorrect}`}>
+                        "{result.correct_answer}"
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Descriptive Results */}
+        {attempt.descriptive_results && attempt.descriptive_results.length > 0 && (
+          <div className={styles.questionsSection}>
+            <h2 className={styles.sectionTitle}>
+              <Lightbulb size={24} />
+              Descriptive Questions
+            </h2>
+            <div className={styles.warningBox}>
+              <p className={styles.warningText}>
+                <strong>Note:</strong> Descriptive answers require manual grading.
+              </p>
+            </div>
+
+            {attempt.descriptive_results.map((result, idx) => (
+              <div
+                key={result.question_id}
+                className={`${styles.questionCard} ${styles.questionCardPartial}`}
+              >
+                <div className={styles.questionHeader}>
+                  <p className={styles.questionNumber}>
+                    <span className={styles.questionNumberSpan}>
+                      {(attempt.mcq_results?.length || 0) +
+                        (attempt.blank_results?.length || 0) +
+                        idx +
+                        1}
+                      .
+                    </span>
+                    {result.question}
+                  </p>
+                  <div className={`${styles.questionStatus} ${styles.statusPartial}`}>
+                    <AlertCircle size={16} />
+                    {result.marks_obtained} / {result.max_marks} marks
+                  </div>
+                </div>
+
+                <div className={styles.answerSection}>
+                  <p className={styles.answerLabel}>Your Answer:</p>
+                  <div className={styles.answerTextArea}>
+                    {result.your_answer || "(No answer provided)"}
+                  </div>
+
+                  <p className={styles.answerLabel}>Expected Answer:</p>
+                  <div className={`${styles.answerTextArea} ${styles.answerExpected}`}>
+                    {result.expected_answer}
+                  </div>
+
+                  {result.feedback && (
+                    <div className={styles.explanation}>
+                      <p className={styles.explanationLabel}>
+                        <Lightbulb size={16} />
+                        Feedback
+                      </p>
+                      <p className={styles.explanationText}>{result.feedback}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <button
-            onClick={() => router.push(`/quiz/${attempt.quiz_id}`)}
-            className="bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 font-semibold transition-colors"
-          >
-            Retake Quiz
-          </button>
+        <div className={styles.actions}>
           <button
             onClick={() => router.push(`/quiz/${attempt.quiz_id}/history`)}
-            className="bg-gray-600 text-white py-3 px-6 rounded-lg hover:bg-gray-700 font-semibold transition-colors"
+            className={`${styles.actionButton} ${styles.secondaryButton}`}
           >
+            <BarChart3 size={20} />
             View All Attempts
+          </button>
+          <button
+            onClick={() => router.push(`/quiz/${attempt.quiz_id}`)}
+            className={`${styles.actionButton} ${styles.primaryButton}`}
+          >
+            <RotateCcw size={20} />
+            Retake Quiz
           </button>
         </div>
       </div>
