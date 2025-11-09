@@ -31,6 +31,32 @@ An interactive network security learning platform built with Next.js, featuring 
 1. Install dependencies:
 ```bash
 npm install
+
+# Install dependencies for running wireshark
+# Mac users
+brew install wireshark
+# allow non-root users capture:
+sudo dsesitgroup -o edit -a"$USER" -t user access_bpf
+# close and reopen shell, then verify with:
+dumpcap -D
+# Where to save captures
+mkdir -p "$PWD/captures"
+export CAP_DIR="$PWD/captures"
+
+# Ubuntu Users
+sudo apt update
+sudo apt install -y wireshark tshark
+sudo dpkg-reconfigure wireshark-common #choose yes
+sudo usermod -aG wireshark $USER
+# close and reopen shell, then verify with:
+dumpcap -D
+mkdir -p "$PWD/captures"
+export CAP_DIR="$PWD/captures"
+
+# Windows Users
+# Install native wireshark, during install 
+# "Install Npcap"
+# "Support loopback traffic" (if offered)
 ```
 
 2. Run the development server:

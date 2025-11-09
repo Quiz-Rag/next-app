@@ -4,6 +4,26 @@ import { useRouter } from 'next/navigation';
 import { listQuizzes } from '@/lib/api';
 import { Plus, Clock, BookOpen, TrendingUp } from 'lucide-react';
 
+async function startTrace(seconds = 10, filter = 'tcp port 3000') {
+  const r = await fetch('/api/trace/start', {
+    method: "POST",
+    headers: {'content-type': 'application/json'},
+    body: JSON.stringify({seconds, filter})
+  });
+  const j = await r.json();
+  return j?.capture?.pcap || null;
+}
+
+async function telemetry(tag, payload = {}) {
+  try {
+    await fetch('/api/telemetry/quiz', {
+      method: "POST",
+      headers: {'content-type':'application/json'},
+      body: JSON.stringify({tag, at: Date.now(), ...payload })
+    });
+  } catch{}
+}
+
 export default function QuizPage() {
   const router = useRouter();
   const [quizzes, setQuizzes] = useState([]);
