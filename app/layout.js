@@ -3,7 +3,11 @@ import Navigation from '@/components/Navigation';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import './globals.css';
 
-const inter = Inter({ subsets: ['latin'] });
+// Load Inter and define a CSS variable
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+});
 
 export const metadata = {
   title: 'NetSec Arcade',
