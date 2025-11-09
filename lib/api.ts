@@ -197,13 +197,8 @@ export async function checkHealth() {
 export type Difficulty = 'easy' | 'medium' | 'hard';
 
 export interface QuizGenerateRequest {
-  topic: string;
-  total_questions: number;
-  num_mcq: number;
-  num_blanks: number;
-  num_descriptive: number;
+  quiz_description: string;
   difficulty?: Difficulty;
-  collection_name?: string;
 }
 
 export interface MCQOption {
@@ -340,6 +335,19 @@ export interface QuizAnalytics {
   completion_rate: number;
 }
 
+// ============= Custom Error Classes =============
+
+export class QuizGenerationError extends Error {
+  constructor(
+    message: string,
+    public status: number,
+    public type: 'out_of_scope' | 'insufficient_content' | 'no_content' | 'invalid_input' | 'server_error'
+  ) {
+    super(message);
+    this.name = 'QuizGenerationError';
+  }
+}
+
 // ============= Quiz API Functions =============
 
 /**
@@ -355,8 +363,34 @@ export async function generateQuiz(request: QuizGenerateRequest): Promise<Quiz> 
   });
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ detail: 'Quiz generation failed' }));
-    throw new Error(error.detail || 'Quiz generation failed');
+    let errorMessage = 'Quiz generation failed';
+    let errorType: QuizGenerationError['type'] = 'server_error';
+
+    try {
+      const error = await response.json();
+      errorMessage = error.detail || errorMessage;
+
+      // Categorize error based on status code and message
+      if (response.status === 400) {
+        if (errorMessage.includes('outside my domain') || 
+            errorMessage.includes('only help with Network Security')) {
+          errorType = 'out_of_scope';
+        } else if (errorMessage.includes('too short') || 
+                   errorMessage.includes('invalid characters')) {
+          errorType = 'invalid_input';
+        }
+      } else if (response.status === 404) {
+        if (errorMessage.includes("don't have any course material")) {
+          errorType = 'no_content';
+        } else if (errorMessage.includes("don't have enough")) {
+          errorType = 'insufficient_content';
+        }
+      }
+    } catch (e) {
+      // If JSON parsing fails, use default error
+    }
+
+    throw new QuizGenerationError(errorMessage, response.status, errorType);
   }
 
   return response.json();
