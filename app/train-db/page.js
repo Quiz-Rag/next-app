@@ -6,7 +6,6 @@ import { Upload, FileText, Check, X, Loader2, Trash2 } from "lucide-react";
 
 export default function TrainDBPage() {
   const [files, setFiles] = useState([]);
-  const [collectionName, setCollectionName] = useState("");
   const [jobId, setJobId] = useState(null);
   const [job, setJob] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -36,10 +35,10 @@ export default function TrainDBPage() {
       let result;
       if (files.length === 1) {
         // Single file upload
-        result = await uploadDocument(files[0], collectionName || undefined);
+        result = await uploadDocument(files[0]);
       } else {
         // Batch upload (2-10 files)
-        result = await uploadDocumentBatch(files, collectionName || undefined);
+        result = await uploadDocumentBatch(files);
       }
       setJobId(result.job_id);
     } catch (err) {
@@ -96,7 +95,6 @@ export default function TrainDBPage() {
     setJobId(null);
     setJob(null);
     setFiles([]);
-    setCollectionName("");
     setError(null);
   };
 
@@ -263,37 +261,6 @@ export default function TrainDBPage() {
               </div>
             )}
 
-            {/* Collection Name */}
-            <div style={{ marginBottom: '1.5rem' }}>
-              <label style={{ 
-                display: 'block',
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                marginBottom: '0.5rem',
-                color: 'var(--text-primary)'
-              }}>
-                Collection Name <span style={{ color: 'var(--text-secondary)' }}>(Optional)</span>
-              </label>
-              <input
-                type="text"
-                value={collectionName}
-                onChange={(e) => setCollectionName(e.target.value)}
-                placeholder="network_security_course"
-                style={{
-                  width: '100%',
-                  padding: '0.75rem',
-                  borderRadius: '0.5rem',
-                  border: '1px solid var(--border-color)',
-                  background: 'var(--bg-dark)',
-                  color: 'var(--text-primary)',
-                  fontSize: '0.875rem'
-                }}
-              />
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
-                Leave empty to use filename as collection name
-              </p>
-            </div>
-
             {/* Upload Button */}
             <button
               onClick={handleUpload}
@@ -457,9 +424,6 @@ export default function TrainDBPage() {
                     <FileText style={{ width: '2rem', height: '2rem', color: 'var(--accent-primary)' }} />
                     <div>
                       <p style={{ fontWeight: '500', color: 'var(--text-primary)' }}>{job.file_name}</p>
-                      <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                        Collection: {job.collection_name}
-                      </p>
                     </div>
                   </div>
                 )}
@@ -655,14 +619,14 @@ export default function TrainDBPage() {
                             <p>• Failed files: <strong>{job.metadata.failed_files}</strong></p>
                           )}
                           <p>• Total chunks: <strong>{job.metadata.total_chunks}</strong></p>
-                          <p>• Text length: <strong>{job.metadata.total_text_length.toLocaleString()}</strong> characters</p>
-                          <p>• Processing time: <strong>{job.metadata.processing_time_seconds.toFixed(1)}s</strong></p>
+                          <p>• Text length: <strong>{job.metadata.total_text_length?.toLocaleString() || 'N/A'}</strong> characters</p>
+                          <p>• Processing time: <strong>{job.metadata.processing_time_seconds?.toFixed(1) || 'N/A'}s</strong></p>
                         </>
                       ) : (
                         <>
                           <p>• Chunks created: <strong>{job.metadata.chunks_count}</strong></p>
-                          <p>• Text length: <strong>{job.metadata.text_length.toLocaleString()}</strong> characters</p>
-                          <p>• Processing time: <strong>{job.metadata.processing_time_seconds}s</strong></p>
+                          <p>• Text length: <strong>{job.metadata.text_length?.toLocaleString() || 'N/A'}</strong> characters</p>
+                          <p>• Processing time: <strong>{job.metadata.processing_time_seconds || 'N/A'}s</strong></p>
                         </>
                       )}
                     </div>

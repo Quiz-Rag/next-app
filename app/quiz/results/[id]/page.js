@@ -2,6 +2,26 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import {
+  Trophy,
+  TrendingUp,
+  BarChart,
+  XCircle,
+  Clock,
+  Calendar,
+  Hash,
+  CheckCircle,
+  AlertCircle,
+  Lightbulb,
+  RotateCcw,
+  Plus,
+  History,
+  Award,
+  Target,
+  ThumbsUp,
+  ThumbsDown,
+} from "lucide-react";
+import styles from "./QuizResults.module.css";
 
 export default function QuizResultsPage({ params }) {
   const router = useRouter();
@@ -20,12 +40,70 @@ export default function QuizResultsPage({ params }) {
     setLoading(false);
   }, [quizId]);
 
+  const formatTime = (seconds) => {
+    if (!seconds) return "N/A";
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  // Format date helper
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const getScoreData = (percentage) => {
+    if (percentage >= 80)
+      return {
+        icon: <Trophy size={64} className={styles.iconExcellent} />,
+        class: styles.scoreExcellent,
+        feedback: "Excellent Work!",
+        feedbackClass: styles.feedbackExcellent,
+      };
+    if (percentage >= 60)
+      return {
+        icon: <TrendingUp size={64} className={styles.iconGood} />,
+        class: styles.scoreGood,
+        feedback: "Good Job!",
+        feedbackClass: styles.feedbackGood,
+      };
+    if (percentage >= 40)
+      return {
+        icon: <BarChart size={64} className={styles.iconFair} />,
+        class: styles.scoreFair,
+        feedback: "Keep Practicing!",
+        feedbackClass: styles.feedbackFair,
+      };
+    return {
+      icon: <XCircle size={64} className={styles.iconPoor} />,
+      class: styles.scorePoor,
+      feedback: "Needs Improvement",
+      feedbackClass: styles.feedbackPoor,
+    };
+  };
+
+  const getDescriptiveScoreStatus = (score, maxScore) => {
+    const percentage = (score / maxScore) * 100;
+    if (percentage >= 80) return { class: styles.statusCorrect, label: "Excellent" };
+    if (percentage >= 60) return { class: styles.statusPartial, label: "Good" };
+    if (percentage >= 40) return { class: styles.statusPartial, label: "Fair" };
+    return { class: styles.statusIncorrect, label: "Needs Work" };
+  };
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading results...</p>
+      <div className={styles.container}>
+        <div className={styles.loading}>
+          <div className={styles.spinner}></div>
+          <p>Loading results...</p>
         </div>
       </div>
     );
@@ -33,158 +111,185 @@ export default function QuizResultsPage({ params }) {
 
   if (!results) {
     return (
-      <div className="flex items-center justify-center min-h-screen p-10">
-        <div className="max-w-md w-full p-6 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <p className="text-yellow-800 font-semibold mb-2">Results Not Found</p>
-          <p className="text-yellow-700 mb-4">
-            Quiz results are not available. Please take the quiz first.
-          </p>
-          <button
-            onClick={() => router.push(`/quiz/${quizId}`)}
-            className="w-full bg-yellow-600 text-white py-2 px-4 rounded hover:bg-yellow-700"
-          >
-            Go to Quiz
-          </button>
+      <div className={styles.container}>
+        <div className={styles.error}>
+          <div className={styles.errorBox}>
+            <p className={styles.errorTitle}>Results Not Found</p>
+            <p className={styles.errorText}>
+              Quiz results are not available. Please take the quiz first.
+            </p>
+            <button
+              onClick={() => router.push(`/quiz/${quizId}`)}
+              className={styles.errorButton}
+            >
+              Go to Quiz
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
   const scorePercentage = results.percentage;
-  const isPassing = scorePercentage >= 60;
-
-  // Format time helper
-  const formatTime = (seconds) => {
-    if (!seconds) return 'N/A';
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}m ${secs}s`;
-  };
-
-  // Format date helper
-  const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    const date = new Date(dateString);
-    return date.toLocaleString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
+  const scoreData = getScoreData(scorePercentage);
 
   return (
-    <div className="min-h-screen p-6 md:p-10">
-      <div className="max-w-5xl mx-auto">
-        {/* Header with Score */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-8 rounded-lg shadow-xl mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-3xl font-bold">Quiz Results</h1>
+    <div className={styles.container}>
+      <div className={styles.content}>
+        {/* Header */}
+        <div className={styles.header}>
+          <div className={styles.headerIcon}>{scoreData.icon}</div>
+          <h1 className={styles.title}>Quiz Results</h1>
+          <p className={styles.subtitle}>{results.topic}</p>
+        </div>
+
+        {/* Score Card */}
+        <div className={styles.scoreCard}>
+          <div className={styles.scoreTop}>
+            <p className={styles.scoreLabel}>Your Score</p>
             {results.attempt_id && (
-              <div className="text-sm bg-white/20 px-3 py-1 rounded-full">
+              <div className={styles.attemptBadge}>
                 Attempt #{results.attempt_id}
               </div>
             )}
           </div>
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div>
-              <p className="text-xl mb-2">{results.topic}</p>
-              <p className="text-blue-100">Total Questions: {results.total_questions}</p>
-              {results.submitted_at && (
-                <p className="text-blue-100 text-sm mt-1">
-                  Submitted: {formatDate(results.submitted_at)}
+          <div className={`${styles.scoreValue} ${scoreData.class}`}>
+            {scorePercentage.toFixed(1)}%
+          </div>
+          <p className={`${styles.scoreFeedback} ${scoreData.feedbackClass}`}>
+            {scoreData.feedback}
+          </p>
+          <div className={styles.scoreBreakdown}>
+            {results.total_auto_score} / {results.max_auto_score} points
+          </div>
+        </div>
+
+        {/* Metadata */}
+        <div className={styles.metadata}>
+          {results.time_taken_seconds && (
+            <div className={styles.metadataCard}>
+              <div className={styles.metadataIcon}>
+                <Clock size={20} />
+              </div>
+              <div className={styles.metadataContent}>
+                <p className={styles.metadataLabel}>Time Taken</p>
+                <p className={styles.metadataValue}>
+                  {formatTime(results.time_taken_seconds)}
                 </p>
-              )}
+              </div>
             </div>
-            <div className="text-right">
-              <div className="text-6xl font-bold mb-2">{scorePercentage.toFixed(1)}%</div>
-              <div className="text-xl">
-                {results.total_auto_score} / {results.max_auto_score} points
+          )}
+
+          {results.submitted_at && (
+            <div className={styles.metadataCard}>
+              <div className={styles.metadataIcon}>
+                <Calendar size={20} />
               </div>
-              {results.time_taken_seconds && (
-                <div className="text-blue-100 text-sm mt-2">
-                  Time: {formatTime(results.time_taken_seconds)}
-                </div>
-              )}
-              <div className={`mt-2 px-4 py-2 rounded-full text-sm font-semibold ${
-                isPassing ? "bg-green-500" : "bg-red-500"
-              }`}>
-                {isPassing ? "✓ PASSED" : "✗ FAILED"}
+              <div className={styles.metadataContent}>
+                <p className={styles.metadataLabel}>Submitted</p>
+                <p className={styles.metadataValue}>
+                  {formatDate(results.submitted_at)}
+                </p>
               </div>
+            </div>
+          )}
+
+          <div className={styles.metadataCard}>
+            <div className={styles.metadataIcon}>
+              <Hash size={20} />
+            </div>
+            <div className={styles.metadataContent}>
+              <p className={styles.metadataLabel}>Questions</p>
+              <p className={styles.metadataValue}>{results.total_questions}</p>
             </div>
           </div>
         </div>
 
         {/* Score Breakdown */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-            <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Multiple Choice</div>
-            <div className="text-2xl font-bold text-blue-600">
+        <div className={styles.breakdownGrid}>
+          <div className={styles.breakdownCard}>
+            <p className={styles.breakdownLabel}>Multiple Choice</p>
+            <p className={`${styles.breakdownValue} ${styles.breakdownMCQ}`}>
               {results.mcq_score} / {results.mcq_results.length}
-            </div>
+            </p>
           </div>
-          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-            <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Fill in Blanks</div>
-            <div className="text-2xl font-bold text-green-600">
+          <div className={styles.breakdownCard}>
+            <p className={styles.breakdownLabel}>Fill in Blanks</p>
+            <p className={`${styles.breakdownValue} ${styles.breakdownBlanks}`}>
               {results.blank_score} / {results.blank_results.length}
-            </div>
+            </p>
           </div>
-          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-            <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Descriptive</div>
-            <div className="text-2xl font-bold text-purple-600">
-              Manual Review Required
-            </div>
+          <div className={styles.breakdownCard}>
+            <p className={styles.breakdownLabel}>Descriptive (AI Graded)</p>
+            <p className={`${styles.breakdownValue} ${styles.breakdownDescriptive}`}>
+              {results.descriptive_score || 0} / {results.max_descriptive_score || 0}
+            </p>
           </div>
         </div>
 
         {/* MCQ Results */}
         {results.mcq_results.length > 0 && (
-          <div className="mb-6">
-            <h2 className="text-2xl font-semibold mb-4">Multiple Choice Results</h2>
+          <div className={styles.questionsSection}>
+            <h2 className={styles.sectionTitle}>
+              <CheckCircle size={24} />
+              Multiple Choice Results
+            </h2>
             {results.mcq_results.map((result, idx) => (
               <div
                 key={result.question_id}
-                className={`bg-white dark:bg-gray-800 p-6 rounded-lg shadow mb-4 border-l-4 ${
-                  result.is_correct ? "border-green-500" : "border-red-500"
+                className={`${styles.questionCard} ${
+                  result.is_correct ? styles.questionCardCorrect : styles.questionCardIncorrect
                 }`}
               >
-                <div className="flex items-start justify-between mb-3">
-                  <p className="font-medium text-lg flex-1">
-                    <span className="text-gray-500 mr-2">{idx + 1}.</span>
+                <div className={styles.questionHeader}>
+                  <p className={styles.questionNumber}>
+                    <span className={styles.questionNumberSpan}>{idx + 1}.</span>
                     {result.question}
                   </p>
-                  {result.is_correct ? (
-                    <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold">
-                      ✓ Correct
-                    </span>
-                  ) : (
-                    <span className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-semibold">
-                      ✗ Wrong
-                    </span>
-                  )}
+                  <div
+                    className={`${styles.questionStatus} ${
+                      result.is_correct ? styles.statusCorrect : styles.statusIncorrect
+                    }`}
+                  >
+                    {result.is_correct ? (
+                      <>
+                        <CheckCircle size={16} />
+                        Correct
+                      </>
+                    ) : (
+                      <>
+                        <XCircle size={16} />
+                        Wrong
+                      </>
+                    )}
+                  </div>
                 </div>
 
-                <div className="ml-6 space-y-2">
-                  <div>
-                    <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Your Answer:</span>
-                    <p className={`mt-1 ${result.is_correct ? "text-green-700 dark:text-green-400" : "text-red-700 dark:text-red-400"}`}>
-                      {result.your_answer_text}
-                    </p>
+                <div className={styles.answerSection}>
+                  <p className={styles.answerLabel}>Your Answer:</p>
+                  <div
+                    className={`${styles.answerText} ${
+                      result.is_correct ? styles.answerCorrect : styles.answerIncorrect
+                    }`}
+                  >
+                    {result.your_answer_text}
                   </div>
 
                   {!result.is_correct && (
-                    <div>
-                      <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Correct Answer:</span>
-                      <p className="mt-1 text-green-700 dark:text-green-400">
+                    <>
+                      <p className={styles.answerLabel}>Correct Answer:</p>
+                      <div className={`${styles.answerText} ${styles.answerCorrect}`}>
                         {result.correct_answer_text}
-                      </p>
-                    </div>
+                      </div>
+                    </>
                   )}
 
-                  <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded">
-                    <span className="text-sm font-semibold text-blue-800 dark:text-blue-300">Explanation:</span>
-                    <p className="mt-1 text-sm text-blue-900 dark:text-blue-200">{result.explanation}</p>
+                  <div className={styles.explanation}>
+                    <p className={styles.explanationLabel}>
+                      <Lightbulb size={16} />
+                      Explanation
+                    </p>
+                    <p className={styles.explanationText}>{result.explanation}</p>
                   </div>
                 </div>
               </div>
@@ -194,51 +299,69 @@ export default function QuizResultsPage({ params }) {
 
         {/* Blank Results */}
         {results.blank_results.length > 0 && (
-          <div className="mb-6">
-            <h2 className="text-2xl font-semibold mb-4">Fill in the Blanks Results</h2>
+          <div className={styles.questionsSection}>
+            <h2 className={styles.sectionTitle}>
+              <AlertCircle size={24} />
+              Fill in the Blanks Results
+            </h2>
             {results.blank_results.map((result, idx) => (
               <div
                 key={result.question_id}
-                className={`bg-white dark:bg-gray-800 p-6 rounded-lg shadow mb-4 border-l-4 ${
-                  result.is_correct ? "border-green-500" : "border-red-500"
+                className={`${styles.questionCard} ${
+                  result.is_correct ? styles.questionCardCorrect : styles.questionCardIncorrect
                 }`}
               >
-                <div className="flex items-start justify-between mb-3">
-                  <p className="font-medium text-lg flex-1">
-                    <span className="text-gray-500 mr-2">{results.mcq_results.length + idx + 1}.</span>
+                <div className={styles.questionHeader}>
+                  <p className={styles.questionNumber}>
+                    <span className={styles.questionNumberSpan}>
+                      {results.mcq_results.length + idx + 1}.
+                    </span>
                     {result.question}
                   </p>
-                  {result.is_correct ? (
-                    <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold">
-                      ✓ Correct
-                    </span>
-                  ) : (
-                    <span className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-semibold">
-                      ✗ Wrong
-                    </span>
-                  )}
+                  <div
+                    className={`${styles.questionStatus} ${
+                      result.is_correct ? styles.statusCorrect : styles.statusIncorrect
+                    }`}
+                  >
+                    {result.is_correct ? (
+                      <>
+                        <CheckCircle size={16} />
+                        Correct
+                      </>
+                    ) : (
+                      <>
+                        <XCircle size={16} />
+                        Wrong
+                      </>
+                    )}
+                  </div>
                 </div>
 
-                <div className="ml-6 space-y-2">
-                  <div>
-                    <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Your Answer:</span>
-                    <p className={`mt-1 font-mono ${result.is_correct ? "text-green-700 dark:text-green-400" : "text-red-700 dark:text-red-400"}`}>
-                      "{result.your_answer}"
-                    </p>
+                <div className={styles.answerSection}>
+                  <p className={styles.answerLabel}>Your Answer:</p>
+                  <div
+                    className={`${styles.answerText} ${
+                      result.is_correct ? styles.answerCorrect : styles.answerIncorrect
+                    }`}
+                  >
+                    "{result.your_answer}"
                   </div>
 
                   {!result.is_correct && (
-                    <div>
-                      <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Correct Answer:</span>
-                      <p className="mt-1 text-green-700 dark:text-green-400 font-mono">
+                    <>
+                      <p className={styles.answerLabel}>Correct Answer:</p>
+                      <div className={`${styles.answerText} ${styles.answerCorrect}`}>
                         "{result.correct_answer}"
-                      </p>
-                    </div>
+                      </div>
+                    </>
                   )}
 
-                  <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded">
-                    <span className="text-sm font-semibold text-blue-800 dark:text-blue-300">Explanation:</span>
-                    <p className="mt-1 text-sm text-blue-900 dark:text-blue-200">{result.explanation}</p>
+                  <div className={styles.explanation}>
+                    <p className={styles.explanationLabel}>
+                      <Lightbulb size={16} />
+                      Explanation
+                    </p>
+                    <p className={styles.explanationText}>{result.explanation}</p>
                   </div>
                 </div>
               </div>
@@ -246,86 +369,214 @@ export default function QuizResultsPage({ params }) {
           </div>
         )}
 
-        {/* Descriptive Results */}
-        {results.descriptive_results.length > 0 && (
-          <div className="mb-6">
-            <h2 className="text-2xl font-semibold mb-4">Descriptive Questions (Manual Review)</h2>
-            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-4">
-              <p className="text-yellow-800 dark:text-yellow-200 text-sm">
-                <strong>Note:</strong> Descriptive answers are not auto-graded. Below are sample answers and key points for reference.
-              </p>
-            </div>
+        {/* Descriptive Results - AI Graded */}
+        {results.descriptive_results && results.descriptive_results.length > 0 && (
+          <div className={styles.questionsSection}>
+            <h2 className={styles.sectionTitle}>
+              <Award size={24} />
+              Descriptive Questions (AI Graded)
+            </h2>
 
-            {results.descriptive_results.map((result, idx) => (
-              <div
-                key={result.question_id}
-                className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow mb-4 border-l-4 border-purple-500"
-              >
-                <p className="font-medium text-lg mb-3">
-                  <span className="text-gray-500 mr-2">
-                    {results.mcq_results.length + results.blank_results.length + idx + 1}.
-                  </span>
-                  {result.question}
-                </p>
+            {results.descriptive_results.map((result, idx) => {
+              const scoreStatus = getDescriptiveScoreStatus(result.score, result.max_score);
+              const scorePercentage = ((result.score / result.max_score) * 100).toFixed(1);
 
-                <div className="ml-6 space-y-3">
-                  <div>
-                    <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Your Answer:</span>
-                    <div className="mt-2 p-3 bg-gray-50 dark:bg-gray-700 rounded">
-                      <p className="text-sm whitespace-pre-wrap">{result.your_answer}</p>
+              return (
+                <div
+                  key={result.question_id}
+                  className={`${styles.questionCard} ${
+                    scorePercentage >= 80
+                      ? styles.questionCardCorrect
+                      : scorePercentage >= 60
+                      ? styles.questionCardPartial
+                      : styles.questionCardIncorrect
+                  }`}
+                >
+                  <div className={styles.questionHeader}>
+                    <p className={styles.questionNumber}>
+                      <span className={styles.questionNumberSpan}>
+                        {results.mcq_results.length + results.blank_results.length + idx + 1}.
+                      </span>
+                      {result.question}
+                    </p>
+                    <div className={`${styles.questionStatus} ${scoreStatus.class}`}>
+                      <Award size={16} />
+                      {result.score}/{result.max_score} ({scorePercentage}%)
                     </div>
                   </div>
 
-                  <div>
-                    <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Sample Answer:</span>
-                    <div className="mt-2 p-3 bg-green-50 dark:bg-green-900/20 rounded">
-                      <p className="text-sm whitespace-pre-wrap text-green-900 dark:text-green-200">
-                        {result.sample_answer}
-                      </p>
-                    </div>
-                  </div>
+                  <div className={styles.answerSection}>
+                    {/* Your Answer */}
+                    <p className={styles.answerLabel}>Your Answer:</p>
+                    <div className={styles.answerTextArea}>{result.your_answer || result.answer}</div>
 
-                  {result.key_points.length > 0 && (
-                    <div>
-                      <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Key Points to Cover:</span>
-                      <ul className="mt-2 ml-4 space-y-1">
-                        {result.key_points.map((point, i) => (
-                          <li key={i} className="text-sm text-gray-700 dark:text-gray-300 list-disc">
-                            {point}
-                          </li>
-                        ))}
-                      </ul>
+                    {/* Expected Answer */}
+                    <p className={styles.answerLabel}>Expected Answer:</p>
+                    <div className={`${styles.answerTextArea} ${styles.answerExpected}`}>
+                      {result.expected_answer}
                     </div>
-                  )}
 
-                  <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded">
-                    <span className="text-sm font-semibold text-blue-800 dark:text-blue-300">Explanation:</span>
-                    <p className="mt-1 text-sm text-blue-900 dark:text-blue-200">{result.explanation}</p>
+                    {/* Score Breakdown */}
+                    {result.breakdown && (
+                      <div className={styles.scoreBreakdownSection}>
+                        <p className={styles.answerLabel}>
+                          <Target size={16} style={{ display: 'inline', marginRight: '0.5rem' }} />
+                          Score Breakdown:
+                        </p>
+                        <div className={styles.breakdownDetails}>
+                          <div className={styles.breakdownItem}>
+                            <span className={styles.breakdownItemLabel}>Content Coverage:</span>
+                            <span className={styles.breakdownItemValue}>
+                              {result.breakdown.content_coverage_score}/70
+                            </span>
+                          </div>
+                          <div className={styles.breakdownItem}>
+                            <span className={styles.breakdownItemLabel}>Accuracy:</span>
+                            <span className={styles.breakdownItemValue}>
+                              {result.breakdown.accuracy_score}/20
+                            </span>
+                          </div>
+                          <div className={styles.breakdownItem}>
+                            <span className={styles.breakdownItemLabel}>Clarity:</span>
+                            <span className={styles.breakdownItemValue}>
+                              {result.breakdown.clarity_score}/10
+                            </span>
+                          </div>
+                          {result.breakdown.extra_content_penalty !== 0 && (
+                            <div className={styles.breakdownItem}>
+                              <span className={styles.breakdownItemLabel}>Extra Content Penalty:</span>
+                              <span className={`${styles.breakdownItemValue} ${styles.penalty}`}>
+                                {result.breakdown.extra_content_penalty}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Points Covered & Missed */}
+                    {(result.points_covered?.length > 0 || result.points_missed?.length > 0) && (
+                      <div className={styles.pointsSection}>
+                        {result.points_covered?.length > 0 && (
+                          <div className={styles.pointsCovered}>
+                            <p className={styles.pointsLabel}>
+                              <ThumbsUp size={16} />
+                              Points Covered:
+                            </p>
+                            <ul className={styles.pointsList}>
+                              {result.points_covered.map((point, i) => (
+                                <li key={i} className={styles.pointItemCovered}>
+                                  ✓ {point}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+
+                        {result.points_missed?.length > 0 && (
+                          <div className={styles.pointsMissed}>
+                            <p className={styles.pointsLabel}>
+                              <ThumbsDown size={16} />
+                              Points Missed:
+                            </p>
+                            <ul className={styles.pointsList}>
+                              {result.points_missed.map((point, i) => (
+                                <li key={i} className={styles.pointItemMissed}>
+                                  ✗ {point}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Extra Content */}
+                    {result.extra_content?.length > 0 && (
+                      <div className={styles.extraContent}>
+                        <p className={styles.pointsLabel}>
+                          <AlertCircle size={16} />
+                          Extra/Irrelevant Content:
+                        </p>
+                        <ul className={styles.pointsList}>
+                          {result.extra_content.map((content, i) => (
+                            <li key={i} className={styles.extraContentItem}>
+                              {content}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* AI Feedback */}
+                    {result.feedback && (
+                      <div className={styles.explanation}>
+                        <p className={styles.explanationLabel}>
+                          <Lightbulb size={16} />
+                          AI Feedback
+                        </p>
+                        <p className={styles.explanationText}>{result.feedback}</p>
+                      </div>
+                    )}
+
+                    {/* Suggestions */}
+                    {result.suggestions?.length > 0 && (
+                      <div className={styles.suggestions}>
+                        <p className={styles.suggestionsLabel}>
+                          <Lightbulb size={16} />
+                          Suggestions for Improvement:
+                        </p>
+                        <ul className={styles.suggestionsList}>
+                          {result.suggestions.map((suggestion, i) => (
+                            <li key={i} className={styles.suggestionItem}>
+                              {suggestion}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Key Points Reference */}
+                    {result.key_points?.length > 0 && (
+                      <div className={styles.keyPoints}>
+                        <p className={styles.answerLabel}>Key Points to Cover:</p>
+                        <ul className={styles.keyPointsList}>
+                          {result.key_points.map((point, i) => (
+                            <li key={i} className={styles.keyPointItem}>
+                              {point}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 
         {/* Action Buttons */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className={styles.actions}>
           <button
             onClick={() => router.push("/quiz/generate")}
-            className="bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 font-semibold transition-colors"
+            className={`${styles.actionButton} ${styles.secondaryButton}`}
           >
+            <Plus size={20} />
             Generate New Quiz
           </button>
           <button
             onClick={() => router.push(`/quiz/${quizId}`)}
-            className="bg-gray-600 text-white py-3 px-6 rounded-lg hover:bg-gray-700 font-semibold transition-colors"
+            className={`${styles.actionButton} ${styles.primaryButton}`}
           >
+            <RotateCcw size={20} />
             Retake Quiz
           </button>
           <button
             onClick={() => router.push(`/quiz/${quizId}/history`)}
-            className="bg-purple-600 text-white py-3 px-6 rounded-lg hover:bg-purple-700 font-semibold transition-colors"
+            className={`${styles.actionButton} ${styles.secondaryButton}`}
           >
+            <History size={20} />
             View History
           </button>
         </div>

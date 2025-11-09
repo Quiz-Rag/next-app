@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import { generateQuiz } from "@/lib/api";
 import { useRouter } from "next/navigation";
+import { Sparkles, BookOpen, Target, Loader2 } from "lucide-react";
+import styles from "./QuizGenerate.module.css";
 
 export default function QuizGeneratorPage() {
   const router = useRouter();
@@ -56,33 +58,44 @@ export default function QuizGeneratorPage() {
     }
   };
 
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-10">
-      <div className="max-w-2xl w-full">
-        <h1 className="text-2xl font-bold mb-6 text-center">Generate AI Quiz</h1>
+  const sum = formData.num_mcq + formData.num_blanks + formData.num_descriptive;
+  const isValidSum = sum === formData.total_questions;
 
-        <form onSubmit={handleSubmit} className="space-y-4 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+  return (
+    <div className={styles.container}>
+      <div className={styles.content}>
+        <div className={styles.header}>
+          <Sparkles size={40} className={styles.headerIcon} />
+          <h1 className={styles.title}>Generate AI Quiz</h1>
+          <p className={styles.subtitle}>
+            Create custom quizzes powered by AI from your trained documents
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} className={styles.form}>
           {/* Topic */}
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Topic <span className="text-red-500">*</span>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>
+              <BookOpen size={18} />
+              Topic <span className={styles.required}>*</span>
             </label>
             <input
               type="text"
               name="topic"
               value={formData.topic}
               onChange={handleChange}
-              placeholder="e.g., SQL Injection, Network Security, Cross-Site Scripting"
+              placeholder="e.g., SQL Injection, Network Security, XSS"
               required
-              className="block w-full border rounded p-2 dark:bg-gray-700 dark:border-gray-600"
+              className={styles.input}
             />
-            <p className="text-xs text-gray-500 mt-1">Enter the topic for quiz generation</p>
+            <p className={styles.hint}>Enter the topic for quiz generation</p>
           </div>
 
           {/* Total Questions */}
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Total Questions <span className="text-red-500">*</span>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>
+              <Target size={18} />
+              Total Questions <span className={styles.required}>*</span>
             </label>
             <input
               type="number"
@@ -92,68 +105,62 @@ export default function QuizGeneratorPage() {
               min="1"
               max="20"
               required
-              className="block w-full border rounded p-2 dark:bg-gray-700 dark:border-gray-600"
+              className={styles.input}
             />
-            <p className="text-xs text-gray-500 mt-1">Total must equal sum of question types below</p>
+            <p className={styles.hint}>Total must equal sum of question types below</p>
           </div>
 
           {/* Question Types */}
-          <div>
-            <label className="block text-sm font-medium mb-2">Question Types Distribution</label>
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
-                  Multiple Choice
-                </label>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Question Types Distribution</label>
+            <div className={styles.questionGrid}>
+              <div className={styles.questionType}>
+                <label className={styles.questionLabel}>Multiple Choice</label>
                 <input
                   type="number"
                   name="num_mcq"
                   value={formData.num_mcq}
                   onChange={handleChange}
                   min="0"
-                  className="block w-full border rounded p-2 dark:bg-gray-700 dark:border-gray-600"
+                  className={styles.input}
                 />
               </div>
-              <div>
-                <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
-                  Fill in Blanks
-                </label>
+              <div className={styles.questionType}>
+                <label className={styles.questionLabel}>Fill in Blanks</label>
                 <input
                   type="number"
                   name="num_blanks"
                   value={formData.num_blanks}
                   onChange={handleChange}
                   min="0"
-                  className="block w-full border rounded p-2 dark:bg-gray-700 dark:border-gray-600"
+                  className={styles.input}
                 />
               </div>
-              <div>
-                <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
-                  Descriptive
-                </label>
+              <div className={styles.questionType}>
+                <label className={styles.questionLabel}>Descriptive</label>
                 <input
                   type="number"
                   name="num_descriptive"
                   value={formData.num_descriptive}
                   onChange={handleChange}
                   min="0"
-                  className="block w-full border rounded p-2 dark:bg-gray-700 dark:border-gray-600"
+                  className={styles.input}
                 />
               </div>
             </div>
-            <p className="text-xs text-gray-500 mt-2">
-              Current sum: {formData.num_mcq + formData.num_blanks + formData.num_descriptive}
-            </p>
+            <div className={`${styles.sumIndicator} ${isValidSum ? styles.sumValid : styles.sumInvalid}`}>
+              {isValidSum ? "✓" : "✗"} Current sum: {sum} / {formData.total_questions}
+            </div>
           </div>
 
           {/* Difficulty */}
-          <div>
-            <label className="block text-sm font-medium mb-2">Difficulty Level</label>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Difficulty Level</label>
             <select
               name="difficulty"
               value={formData.difficulty}
               onChange={handleChange}
-              className="block w-full border rounded p-2 dark:bg-gray-700 dark:border-gray-600"
+              className={styles.select}
             >
               <option value="easy">Easy</option>
               <option value="medium">Medium</option>
@@ -163,36 +170,41 @@ export default function QuizGeneratorPage() {
 
           {/* Error Message */}
           {error && (
-            <div className="p-3 bg-red-50 border border-red-200 text-red-800 rounded text-sm">
-              <p className="font-semibold">Error:</p>
+            <div className={styles.errorBox}>
+              <p className={styles.errorTitle}>Error:</p>
               <p>{error}</p>
             </div>
           )}
 
-          {/* Info Box */}
+          {/* Generating Message */}
           {generating && (
-            <div className="p-3 bg-blue-50 border border-blue-200 text-blue-800 rounded text-sm">
-              <p className="font-semibold mb-1">⏳ Generating Quiz...</p>
-              <p>This may take 10-30 seconds. Please wait while AI generates your questions.</p>
+            <div className={styles.infoBox}>
+              <Loader2 size={20} className={styles.spinner} />
+              <div>
+                <p className={styles.infoTitle}>Generating Quiz...</p>
+                <p className={styles.infoText}>
+                  This may take 10-30 seconds. Please wait while AI generates your questions.
+                </p>
+              </div>
             </div>
           )}
 
           {/* Submit Button */}
           <button
             type="submit"
-            disabled={generating}
-            className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-colors"
+            disabled={generating || !isValidSum}
+            className={styles.submitButton}
           >
             {generating ? (
-              <span className="flex items-center justify-center">
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
+              <>
+                <Loader2 size={20} className={styles.spinner} />
                 Generating Quiz... (10-30s)
-              </span>
+              </>
             ) : (
-              "Generate Quiz"
+              <>
+                <Sparkles size={20} />
+                Generate Quiz
+              </>
             )}
           </button>
         </form>

@@ -36,64 +36,159 @@ export default function QuizPage() {
     });
   };
 
-  const getDifficultyColor = (difficulty) => {
+  const getDifficultyStyle = (difficulty) => {
     switch (difficulty.toLowerCase()) {
       case 'easy':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+        return { background: 'rgba(34, 197, 94, 0.2)', color: '#4ade80', border: '1px solid #4ade80' };
       case 'medium':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+        return { background: 'rgba(245, 158, 11, 0.2)', color: '#fbbf24', border: '1px solid #fbbf24' };
       case 'hard':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+        return { background: 'rgba(239, 68, 68, 0.2)', color: '#f87171', border: '1px solid #f87171' };
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+        return { background: 'rgba(148, 163, 184, 0.2)', color: '#94a3b8', border: '1px solid #94a3b8' };
     }
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading quizzes...</p>
+      <div style={{
+        minHeight: '100vh',
+        background: 'var(--bg-dark)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{
+            width: '3rem',
+            height: '3rem',
+            border: '3px solid var(--border-color)',
+            borderTop: '3px solid var(--accent-primary)',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 1rem'
+          }}></div>
+          <p style={{ color: 'var(--text-secondary)' }}>Loading quizzes...</p>
         </div>
+        <style jsx>{`
+          @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+          }
+        `}</style>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen p-6 md:p-10">
-      <div className="max-w-7xl mx-auto">
+    <div style={{
+      minHeight: '100vh',
+      background: 'var(--bg-dark)',
+      padding: '3rem 1.5rem'
+    }}>
+      <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">AI-Generated Quizzes</h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            View all your attempted quizzes and track your progress
+        <div style={{ marginBottom: '3rem', textAlign: 'center' }}>
+          <h1 style={{
+            fontSize: '2.5rem',
+            fontWeight: 'bold',
+            marginBottom: '0.5rem',
+            background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text'
+          }}>
+            AI-Generated Quizzes
+          </h1>
+          <p style={{
+            color: 'var(--text-secondary)',
+            fontSize: '0.875rem'
+          }}>
+            View all your quizzes and track your progress
           </p>
         </div>
 
         {/* Error State */}
         {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 mb-6">
-            <p className="text-red-800 dark:text-red-200 font-semibold mb-2">Error Loading Quizzes</p>
-            <p className="text-red-700 dark:text-red-300">{error}</p>
+          <div style={{
+            background: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid var(--accent-danger)',
+            borderRadius: '0.75rem',
+            padding: '1.5rem',
+            marginBottom: '1.5rem'
+          }}>
+            <p style={{
+              color: 'var(--accent-danger)',
+              fontWeight: '600',
+              marginBottom: '0.5rem'
+            }}>
+              Error Loading Quizzes
+            </p>
+            <p style={{ color: 'var(--accent-danger)', fontSize: '0.875rem' }}>
+              {error}
+            </p>
           </div>
         )}
 
         {/* Empty State */}
         {!error && quizzes.length === 0 && (
-          <div className="text-center py-16">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full mb-6">
-              <BookOpen className="w-10 h-10 text-gray-400" />
+          <div style={{
+            textAlign: 'center',
+            padding: '4rem 1rem'
+          }}>
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '5rem',
+              height: '5rem',
+              background: 'var(--bg-card)',
+              borderRadius: '50%',
+              marginBottom: '1.5rem',
+              border: '1px solid var(--border-color)'
+            }}>
+              <BookOpen style={{ width: '2.5rem', height: '2.5rem', color: 'var(--text-secondary)' }} />
             </div>
-            <h2 className="text-2xl font-semibold mb-2">No Quizzes Yet</h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
+            <h2 style={{
+              fontSize: '1.5rem',
+              fontWeight: '600',
+              marginBottom: '0.5rem',
+              color: 'var(--text-primary)'
+            }}>
+              No Quizzes Yet
+            </h2>
+            <p style={{
+              color: 'var(--text-secondary)',
+              marginBottom: '1.5rem',
+              fontSize: '0.875rem'
+            }}>
               Get started by generating your first AI-powered quiz
             </p>
             <button
               onClick={() => router.push('/quiz/generate')}
-              className="bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 font-semibold transition-colors inline-flex items-center"
+              style={{
+                background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
+                color: 'white',
+                padding: '0.75rem 1.5rem',
+                borderRadius: '0.5rem',
+                fontWeight: '600',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                transition: 'all 0.3s'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 0 20px rgba(0, 217, 255, 0.4)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
             >
-              <Plus className="w-5 h-5 mr-2" />
+              <Plus style={{ width: '1.25rem', height: '1.25rem' }} />
               Generate Your First Quiz
             </button>
           </div>
@@ -101,45 +196,123 @@ export default function QuizPage() {
 
         {/* Quiz Grid */}
         {quizzes.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+            gap: '1.5rem',
+            marginBottom: '6rem'
+          }}>
             {quizzes.map((quiz) => (
               <div
                 key={quiz.quiz_id}
                 onClick={() => router.push(`/quiz/${quiz.quiz_id}/history`)}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transition-all cursor-pointer border-2 border-transparent hover:border-blue-500 p-6"
+                style={{
+                  background: 'var(--bg-card)',
+                  borderRadius: '0.75rem',
+                  border: '1px solid var(--border-color)',
+                  padding: '1.5rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s',
+                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--accent-primary)';
+                  e.currentTarget.style.boxShadow = '0 0 20px rgba(0, 217, 255, 0.2)';
+                  e.currentTarget.style.transform = 'translateY(-4px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--border-color)';
+                  e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
               >
                 {/* Quiz Header */}
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
-                    <h3 className="text-xl font-bold mb-2 line-clamp-2">{quiz.topic}</h3>
-                    <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${getDifficultyColor(quiz.difficulty)}`}>
-                      {quiz.difficulty}
-                    </span>
-                  </div>
+                <div style={{ marginBottom: '1rem' }}>
+                  <h3 style={{
+                    fontSize: '1.25rem',
+                    fontWeight: 'bold',
+                    marginBottom: '0.75rem',
+                    color: 'var(--text-primary)',
+                    lineHeight: '1.4',
+                    minHeight: '2.8rem'
+                  }}>
+                    {quiz.topic}
+                  </h3>
+                  <span style={{
+                    ...getDifficultyStyle(quiz.difficulty),
+                    display: 'inline-block',
+                    padding: '0.25rem 0.75rem',
+                    borderRadius: '9999px',
+                    fontSize: '0.75rem',
+                    fontWeight: '600',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em'
+                  }}>
+                    {quiz.difficulty}
+                  </span>
                 </div>
 
                 {/* Quiz Stats */}
-                <div className="space-y-3 mb-4">
-                  <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                    <BookOpen className="w-4 h-4 mr-2" />
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.75rem',
+                  marginBottom: '1rem'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    fontSize: '0.875rem',
+                    color: 'var(--text-secondary)'
+                  }}>
+                    <BookOpen style={{ width: '1rem', height: '1rem', marginRight: '0.5rem' }} />
                     <span>{quiz.total_questions} Questions</span>
                   </div>
-                  <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                    <Clock className="w-4 h-4 mr-2" />
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    fontSize: '0.875rem',
+                    color: 'var(--text-secondary)'
+                  }}>
+                    <Clock style={{ width: '1rem', height: '1rem', marginRight: '0.5rem' }} />
                     <span>{formatDate(quiz.created_at)}</span>
                   </div>
                 </div>
 
                 {/* Action Button */}
-                <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div style={{
+                  paddingTop: '1rem',
+                  borderTop: '1px solid var(--border-color)'
+                }}>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       router.push(`/quiz/${quiz.quiz_id}/history`);
                     }}
-                    className="w-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 py-2 px-4 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/40 font-medium transition-colors flex items-center justify-center"
+                    style={{
+                      width: '100%',
+                      background: 'rgba(0, 217, 255, 0.1)',
+                      color: 'var(--accent-primary)',
+                      padding: '0.625rem 1rem',
+                      borderRadius: '0.5rem',
+                      fontWeight: '500',
+                      border: '1px solid var(--accent-primary)',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.5rem',
+                      fontSize: '0.875rem'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'rgba(0, 217, 255, 0.2)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'rgba(0, 217, 255, 0.1)';
+                    }}
                   >
-                    <TrendingUp className="w-4 h-4 mr-2" />
+                    <TrendingUp style={{ width: '1rem', height: '1rem' }} />
                     View History & Attempts
                   </button>
                 </div>
@@ -151,13 +324,35 @@ export default function QuizPage() {
         {/* Floating Action Button */}
         <button
           onClick={() => router.push('/quiz/generate')}
-          className="fixed bottom-8 right-8 bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-full shadow-2xl hover:shadow-3xl transition-all transform hover:scale-110 flex items-center justify-center group"
+          style={{
+            position: 'fixed',
+            bottom: '2rem',
+            right: '2rem',
+            background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
+            color: 'white',
+            padding: '1rem',
+            borderRadius: '50%',
+            boxShadow: '0 4px 20px rgba(0, 217, 255, 0.3)',
+            border: 'none',
+            cursor: 'pointer',
+            transition: 'all 0.3s',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'scale(1.1) rotate(90deg)';
+            e.currentTarget.style.boxShadow = '0 6px 30px rgba(0, 217, 255, 0.5)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'scale(1) rotate(0deg)';
+            e.currentTarget.style.boxShadow = '0 4px 20px rgba(0, 217, 255, 0.3)';
+          }}
           aria-label="Generate New Quiz"
+          title="Generate New Quiz"
         >
-          <Plus className="w-6 h-6" />
-          <span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 ease-in-out whitespace-nowrap ml-0 group-hover:ml-2">
-            Generate Quiz
-          </span>
+          <Plus style={{ width: '1.5rem', height: '1.5rem' }} />
         </button>
       </div>
     </div>
