@@ -1,5 +1,5 @@
 import { Inter } from 'next/font/google';
-import Navigation from '@/components/Navigation';
+import Navigation from "@/components/Navigation";
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import './globals.css';
 

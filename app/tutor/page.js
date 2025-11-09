@@ -1,243 +1,259 @@
 "use client";
-import { useRef, useState } from "react";
+
+import { useEffect, useRef, useState } from "react";
 import styles from "./page.module.css";
 
+// ---------------- CONFIG ----------------
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
-const MAX_FILES = 10;
-const ACCEPT = ".pdf,.ppt,.pptx,.docx,.txt,.md";
+// Default slide collection
+const COLLECTION = "lecture_3_slides";
+// -----------------------------------------
 
-export default function TutorPage() {
-  const [provider, setProvider] = useState("openai"); // "openai" | "deepseek"
-  const [files, setFiles] = useState([]);
-  const [notes, setNotes] = useState("");
-  const [question, setQuestion] = useState("");
-  const [answer, setAnswer] = useState("");
-  const [cites, setCites] = useState([]);
+export default function TutorPage() { 
   const [busy, setBusy] = useState(false);
-  const fileInputRef = useRef(null);
+  const [status, setStatus] = useState("");
+  const [messages, setMessages] = useState([
+    { role: "assistant", content: "Hi! How can I help you?", cites: [] },
+  ]);
+  const [input, setInput] = useState("");
+  const endRef = useRef(null);
 
-  // ---- helpers -------------------------------------------------------------
-  function dedupeCapMerge(existing, incoming) {
-    const merged = [...existing, ...incoming];
-    const seen = new Set();
-    const unique = [];
-    for (const f of merged) {
-      const key = `${f.name}|${f.size}|${f.lastModified}`;
-      if (seen.has(key)) continue;
-      seen.add(key);
-      unique.push(f);
+  // Auto-scroll chat
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  // Tiny toast
+  function toast(msg) {
+    setStatus(msg);
+    setTimeout(() => setStatus(""), 2400);
+  }
+
+  // ============================================================
+  // CALL BACKEND RAG ENDPOINT
+  // ============================================================
+  async function askOnce({ text, top_k = 5 }) {
+    const body = {
+      query: text,
+      collection_name: COLLECTION,
+      top_k
+    };
+
+    const res = await fetch(`${API}/api/ask`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+
+    if (!res.ok) {
+      const t = await res.text().catch(() => "");
+      throw new Error(`API ${res.status}: ${t}`);
     }
-    if (unique.length > MAX_FILES) alert(`Max ${MAX_FILES} files. Extra files ignored.`);
-    return unique.slice(0, MAX_FILES);
+
+    return await res.json();  // { answer, citations }
   }
 
-  async function uploadFiles(filesToUpload) {
-    if (!filesToUpload.length) return;
-    const fd = new FormData();
-    filesToUpload.forEach(f => fd.append("files", f));
+  // ============================================================
+  // SEND USER MESSAGE
+  // ============================================================
+  async function sendMessage() {
+    if (busy) return;
+    const text = input.trim();
+    if (!text) return;
+
+    setInput("");
+    setMessages(m => [...m, { role: "user", content: text }]);
+    setMessages(m => [...m, { role: "assistant", content: "Thinking…", cites: [] }]);
     setBusy(true);
+
     try {
-      const r = await fetch(`${API}/ingest_files`, { method: "POST", body: fd });
-      const j = await r.json().catch(() => ({}));
-      if (!r.ok) throw new Error(j.detail || "Upload failed");
-      alert(`Files: ${j.files} | Added chunks: ${j.added} | Total: ${j.total}`);
-    } catch (e) {
-      alert(String(e));
-    } finally {
-      setBusy(false);
-    }
-  }
+      const { answer, citations } = await askOnce({ text, top_k: 5 });
 
-  async function onPickFiles(e) {
-    const incoming = Array.from(e.target.files || []);
-    if (!incoming.length) return;
-    const next = dedupeCapMerge(files, incoming);
-    const existingKeys = new Set(files.map(f => `${f.name}|${f.size}|${f.lastModified}`));
-    const newOnes = incoming.filter(f => !existingKeys.has(`${f.name}|${f.size}|${f.lastModified}`));
-    const nextKeys = new Set(next.map(f => `${f.name}|${f.size}|${f.lastModified}`));
-    const willUpload = newOnes.filter(f => nextKeys.has(`${f.name}|${f.size}|${f.lastModified}`));
-    setFiles(next);
-    await uploadFiles(willUpload);
-    e.target.value = "";
-  }
-
-  function removeFile(idx) { setFiles(prev => prev.filter((_, i) => i !== idx)); }
-
-  async function insertText() {
-    if (!notes.trim()) return alert("Paste some notes.");
-    setBusy(true);
-    try {
-      const r = await fetch(`${API}/ingest_text`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: notes })
+      setMessages(m => {
+        const copy = [...m];
+        copy[copy.length - 1] = {
+          role: "assistant",
+          content: answer,
+          cites: citations
+        };
+        return copy;
       });
-      const j = await r.json().catch(() => ({}));
-      if (!r.ok) throw new Error(j.detail || "Insert failed");
-      alert(`Added: ${j.added} | Total: ${j.total}`);
     } catch (e) {
-      alert(String(e));
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function ask() {
-    if (!question.trim()) return alert("Type a question.");
-    setBusy(true);
-    try {
-      const r = await fetch(`${API}/ask`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: question, provider, top_k: 5 })
+      setMessages(m => {
+        const copy = [...m];
+        copy[copy.length - 1] = {
+          role: "assistant",
+          content: `⚠️ Error: ${e.message}`,
+          cites: []
+        };
+        return copy;
       });
-      const j = await r.json().catch(() => ({}));
-      if (!r.ok) throw new Error(j.detail || "Ask failed");
-
-      setAnswer(j.answer || "");
-      const raw = j.citations || [];
-      const normalized = raw.map((c, i) => {
-        if (typeof c === "string") return c;
-        if (c && typeof c === "object") {
-          const title = c.title ?? c.name ?? `Source ${i + 1}`;
-          const loc = c.location ?? c.page ?? c.chunk ?? "";
-          const extra = c.snippet ? ` — ${c.snippet}` : "";
-          return loc ? `${title} — ${loc}${extra}` : `${title}${extra}`;
-        }
-        return `Source ${i + 1}`;
-      });
-      setCites(normalized);
-    } catch (e) {
-      alert(String(e));
     } finally {
       setBusy(false);
     }
   }
 
-  async function reset() {
-    setBusy(true);
-    try {
-      await fetch(`${API}/reset`, { method: "POST" });
-      setAnswer(""); setCites([]); setNotes(""); setFiles([]);
-      alert("Cleared store.");
-    } finally {
-      setBusy(false);
+  function onKeyDown(e) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      if (!busy) sendMessage();
     }
   }
 
-  // ---- UI ------------------------------------------------------------------
+  // Chat actions
+  function clearChat() {
+    setMessages([{ role: "assistant", content: "Chat cleared. Ask away!", cites: [] }]);
+  }
+
+  function resetStore() {
+    toast("Reset is not available on this backend.");
+  }
+
+  // ============================================================
+  // UI
+  // ============================================================
   return (
-    <main className={styles.container}>
-      <section className={styles.card}>
-        <h1 className={styles.title}>AI Tutor</h1>
-        <p className={styles.subtitle}>Chat from your notes & slides • Citations included</p>
+    <div style={{ minHeight: "100vh", background: "#0b1220", padding: "3rem 1.5rem" }}>
+      <div style={{ maxWidth: "60rem", margin: "0 auto" }}>
 
-        <div className={styles.row} style={{ marginBottom: 8 }}>
-          <strong>Chatbot:</strong>
-          <label>
-            <input
-              type="radio"
-              name="prov"
-              checked={provider === "openai"}
-              onChange={() => setProvider("openai")}
-              disabled={busy}
-            />{" "}
-            ChatGPT (OpenAI)
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="prov"
-              checked={provider === "deepseek"}
-              onChange={() => setProvider("deepseek")}
-              disabled={busy}
-            />{" "}
-            DeepSeek
-          </label>
-        </div>
+        {/* Title */}
+        <h1
+          style={{
+            fontSize: "2rem",
+            fontWeight: "bold",
+            textAlign: "center",
+            marginBottom: "0.5rem",
+            background: "linear-gradient(135deg,#00d9ff,#7c5cff)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+          }}
+        >
+          AI Tutor
+        </h1>
+        <p style={{ textAlign: "center", color: "#94a3b8", marginBottom: "1.5rem" }}>
+          Chat • Answers from your slides
+        </p>
 
-        <hr className={styles.divider} />
-
-        {/* Upload */}
-        <h3 className={styles.sectionTitle}>1) Upload your notes (up to {MAX_FILES} files)</h3>
-        <input
-          ref={fileInputRef}
-          type="file"
-          multiple
-          accept={ACCEPT}
-          onChange={onPickFiles}
-          disabled={busy}
-          style={{ display: "none" }}
-        />
-        <div className={styles.rowLeft}>
-          <button
-            className={styles.btn}
-            onClick={() => fileInputRef.current?.click()}
-            disabled={busy}
+        {/* Main Card */}
+        <section
+          style={{
+            background: "#111a2b",
+            padding: "2rem",
+            borderRadius: "1rem",
+            border: "1px solid #20304d",
+          }}
+        >
+          {/* Toolbar */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "0.75rem 1rem",
+              border: "1px solid #20304d",
+              borderRadius: "0.875rem",
+              background: "#0b1220",
+              marginBottom: "1rem",
+            }}
           >
-            Insert Files
-          </button>
-          <span className={styles.muted}>Accepted: {ACCEPT.replaceAll(",", ", ")}</span>
-        </div>
+  
 
-        {files.length > 0 && (
-          <div className={styles.fileList}>
-            {files.map((f, i) => (
-              <div key={`${f.name}-${f.size}-${f.lastModified}`} className={styles.fileItem}>
-                <span className={styles.truncate} title={f.name}>{f.name}</span>
-                <button className={styles.linkBtn} onClick={() => removeFile(i)} disabled={busy}>
-                  Remove
-                </button>
+            <div style={{ display: "flex", gap: 12 }}>
+              <button onClick={clearChat} style={btnSmall}>Clear Chat</button>
+              <button onClick={resetStore} style={btnSmall}>Reset Store</button>
+            </div>
+          </div>
+
+          {/* Chat window */}
+          <div style={{ height: "56vh", overflowY: "auto", padding: 12 }}>
+            {messages.map((m, i) => (
+              <div
+                key={i}
+                style={{
+                  display: "flex",
+                  justifyContent: m.role === "user" ? "flex-end" : "flex-start",
+                  margin: "12px 0"
+                }}
+              >
+                <div
+                  style={{
+                    maxWidth: "70ch",
+                    border: "1px solid #20304d",
+                    background: "#0b1220",
+                    color: "#e6eefc",
+                    padding: "10px 12px",
+                    borderRadius: 14,
+                    whiteSpace: "pre-wrap"
+                  }}
+                >
+                  {m.content}
+                  {m.cites?.length > 0 && (
+                    <ul style={{ marginTop: 8, paddingLeft: 18, fontSize: 13, color: "#93a3bd" }}>
+                      {m.cites.map((c, j) => <li key={j}>{c}</li>)}
+                    </ul>
+                  )}
+                </div>
               </div>
             ))}
-            <div className={styles.muted}>{files.length}/{MAX_FILES} selected</div>
+            <div ref={endRef} />
           </div>
-        )}
 
-        {/* Paste Text */}
-        <h3 className={styles.sectionTitle} style={{ marginTop: 18 }}>Paste Text</h3>
-        <textarea
-          rows={6}
-          className={styles.textarea}
-          value={notes}
-          onChange={e => setNotes(e.target.value)}
-          placeholder="Paste class notes, slide text, definitions…"
-          disabled={busy}
-        />
-        <div className={styles.rowLeft} style={{ marginTop: 8 }}>
-          <button className={styles.btn} onClick={insertText} disabled={busy || !notes.trim()}>
-            Insert Text
-          </button>
-          <button className={styles.btnGhost} onClick={reset} disabled={busy}>
-            Reset Text
-          </button>
-        </div>
+          {/* Input */}
+          <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
+            <textarea
+              placeholder='Type a question… e.g., "TLS handshake (slide 12)"'
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={onKeyDown}
+              disabled={busy}
+              rows={3}
+              style={{
+                flex: 1,
+                minHeight: 76,
+                maxHeight: 220,
+                resize: "vertical",
+                borderRadius: 12,
+                border: "1px solid #20304d",
+                background: "#0b1220",
+                color: "#e6eefc",
+                padding: "10px 12px",
+              }}
+            />
+            <button
+              onClick={sendMessage}
+              disabled={busy || !input.trim()}
+              style={btnSend(busy)}
+            >
+              {busy ? "Working…" : "Send"}
+            </button>
+          </div>
 
-        {/* Ask */}
-        <h3 className={styles.sectionTitle} style={{ marginTop: 18 }}>2) Ask a question</h3>
-        <input
-          className={styles.input}
-          value={question}
-          onChange={e => setQuestion(e.target.value)}
-          placeholder="e.g., Explain TLS handshake"
-          disabled={busy}
-        />
-        {/* intentionally pushed down a bit, like your request */}
-        <div className={styles.rowLeft} style={{ marginTop: 18 }}>
-          <button className={styles.btnPrimary} onClick={ask} disabled={busy || !question.trim()}>
-            {busy ? "Working..." : "Ask Tutor"}
-          </button>
-        </div>
-
-        {/* Answer */}
-        <h3 className={styles.sectionTitle} style={{ marginTop: 18 }}>Answer</h3>
-        <div className={styles.answerBox}>{answer}</div>
-
-        <h4 className={styles.sectionTitle} style={{ marginTop: 12 }}>Citations (top matches from your notes)</h4>
-        <ul className={styles.citeList}>
-          {cites.map((c, i) => <li key={i}>{c}</li>)}
-        </ul>
-      </section>
-    </main>
+          {status && (
+            <p style={{ textAlign: "center", marginTop: 8, color: "#00d9ff" }}>{status}</p>
+          )}
+        </section>
+      </div>
+    </div>
   );
 }
+
+// ---------------- BUTTON STYLES ----------------
+const btnSmall = {
+  background: "transparent",
+  color: "#cfe3ff",
+  border: "1px solid #2b3b5a",
+  borderRadius: 24,
+  padding: "8px 14px",
+  cursor: "pointer"
+};
+
+const btnSend = (busy) => ({
+  border: "none",
+  borderRadius: 12,
+  padding: "12px 18px",
+  background: "linear-gradient(135deg,#00d9ff,#7c5cff)",
+  color: "#08111f",
+  fontWeight: 700,
+  cursor: busy ? "not-allowed" : "pointer",
+  opacity: busy ? 0.6 : 1,
+});
