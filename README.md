@@ -147,8 +147,8 @@
 │  ┌──────▼──────────────────▼──────────────────▼──────┐          │
 │  │              Core Services Layer                    │          │
 │  │  ┌─────────────┐  ┌──────────────┐  ┌──────────┐ │          │
-│  │  │ OpenAI LLM  │  │ RAG Pipeline │  │Embedding │ │          │
-│  │  │ (GPT-4)     │  │ (ChromaDB)   │  │Generator │ │          │
+│  │  │  Groq LLM   │  │ RAG Pipeline │  │Embedding │ │          │
+│  │  │ (Llama 3.1) │  │ (ChromaDB)   │  │Generator │ │          │
 │  │  └─────────────┘  └──────────────┘  └──────────┘ │          │
 │  └──────────────────────────────────────────────────┘          │
 └──────────────────────────────┬───────────────────────────────────┘
@@ -184,7 +184,7 @@
 #### Backend
 - **Framework**: FastAPI 0.104+
 - **AI/ML**: 
-  - OpenAI GPT-4 (Quiz generation, Chat responses)
+  - Groq API with Llama 3.1 8B Instant (Quiz generation, Chat responses)
   - sentence-transformers (Text embeddings)
 - **Vector Database**: ChromaDB 0.4+
 - **Database**: SQLite (Metadata storage)
@@ -243,9 +243,10 @@
 
 ### API Keys Required
 
-1. **OpenAI API Key**: Get from [platform.openai.com](https://platform.openai.com/)
+1. **Groq API Key**: Get from [console.groq.com](https://console.groq.com/)
    - Used for quiz generation and AI tutor
-   - Requires GPT-4 access
+   - Free tier available with rate limits
+   - Model: llama-3.1-8b-instant
 
 ---
 
@@ -297,8 +298,9 @@ pip install -r requirements.txt
 # Create environment file
 cp .env.example .env
 
-# Edit .env and add your OpenAI API key:
-OPENAI_API_KEY=sk-your-api-key-here
+# Edit .env and add your Groq API key:
+GROQ_API_KEY=gsk_your-api-key-here
+GROQ_MODEL=llama-3.1-8b-instant
 ```
 
 ### Step 4: Wireshark Setup (Optional)
@@ -372,9 +374,9 @@ NEXT_PUBLIC_ENABLE_ANALYTICS=false
 ### Backend Configuration (.env)
 
 ```bash
-# OpenAI Configuration
-OPENAI_API_KEY=sk-your-api-key-here
-OPENAI_MODEL=gpt-4-1106-preview
+# Groq Configuration
+GROQ_API_KEY=gsk_your-api-key-here
+GROQ_MODEL=llama-3.1-8b-instant
 
 # Database Configuration
 DATABASE_URL=sqlite:///./netsec.db
@@ -891,8 +893,8 @@ pytest                              # Run tests
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
 | `NEXT_PUBLIC_API_URL` | Yes | `http://localhost:8000` | Backend API URL |
-| `OPENAI_API_KEY` | Yes | - | OpenAI API key (backend) |
-| `OPENAI_MODEL` | No | `gpt-4-1106-preview` | GPT model to use |
+| `GROQ_API_KEY` | Yes | - | Groq API key (backend) |
+| `GROQ_MODEL` | No | `llama-3.1-8b-instant` | Groq model to use |
 | `DATABASE_URL` | No | `sqlite:///./netsec.db` | Database connection |
 | `CHROMA_PERSIST_DIRECTORY` | No | `./chroma_data` | ChromaDB storage path |
 | `DUMPCAP_PATH` | No | Auto-detected | Path to dumpcap binary |
@@ -923,11 +925,11 @@ lsof -i :8000  # macOS/Linux
 netstat -ano | findstr :8000  # Windows
 ```
 
-#### 3. OpenAI API errors
+#### 3. Groq API errors
 - Verify API key is correct in `.env`
-- Check API key has GPT-4 access
-- Verify billing is active
-- Check rate limits
+- Check API key is active at [console.groq.com](https://console.groq.com/)
+- Verify rate limits haven't been exceeded
+- Model `llama-3.1-8b-instant` is available
 
 #### 4. Wireshark capture fails
 ```bash
@@ -979,7 +981,7 @@ LOG_LEVEL=DEBUG uvicorn main:app --reload
 #### Slow Quiz Generation
 - Use smaller documents (< 10MB each)
 - Reduce number of questions
-- Check OpenAI API response time
+- Check Groq API response time (usually very fast)
 - Consider caching common queries
 
 #### Slow Chat Responses
@@ -1078,7 +1080,8 @@ SOFTWARE.
 
 ## 🙏 Acknowledgments
 
-- **OpenAI** for GPT-4 API
+- **Groq** for fast LLM inference with Llama 3.1
+- **Meta AI** for Llama 3.1 model
 - **Wireshark** team for network analysis tools
 - **ChromaDB** for vector database
 - **Next.js** team for the amazing framework
