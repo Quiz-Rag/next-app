@@ -1,259 +1,335 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import styles from "./page.module.css";
+import React, { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import { 
+  startChatSession, 
+  getChatHistory, 
+  getChatSessionInfo,
+  endChatSession 
+} from '@/lib/api';
+import ChatHeader from '@/components/chat/ChatHeader';
+import ChatMessage from '@/components/chat/ChatMessage';
+import ChatInput from '@/components/chat/ChatInput';
+import { Loader2, AlertCircle } from 'lucide-react';
+import styles from './ChatTutor.module.css';
 
-// ---------------- CONFIG ----------------
-const API = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
-// Default slide collection
-const COLLECTION = "lecture_3_slides";
-// -----------------------------------------
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-export default function TutorPage() { 
-  const [busy, setBusy] = useState(false);
-  const [status, setStatus] = useState("");
-  const [messages, setMessages] = useState([
-    { role: "assistant", content: "Hi! How can I help you?", cites: [] },
-  ]);
-  const [input, setInput] = useState("");
-  const endRef = useRef(null);
+export default function ChatTutorPage() {
+  const router = useRouter();
+  const [sessionId, setSessionId] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [inputText, setInputText] = useState('');
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [currentResponse, setCurrentResponse] = useState('');
+  const [sessionInfo, setSessionInfo] = useState(null);
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const messagesEndRef = useRef(null);
+  const tokenBufferRef = useRef('');
+  const bufferTimeoutRef = useRef(null);
 
-  // Auto-scroll chat
+  // Auto-scroll to bottom
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, currentResponse]);
 
-  // Tiny toast
-  function toast(msg) {
-    setStatus(msg);
-    setTimeout(() => setStatus(""), 2400);
-  }
+  // Initialize chat session
+  useEffect(() => {
+    initializeChat();
+  }, []);
 
-  // ============================================================
-  // CALL BACKEND RAG ENDPOINT
-  // ============================================================
-  async function askOnce({ text, top_k = 5 }) {
-    const body = {
-      query: text,
-      collection_name: COLLECTION,
-      top_k
-    };
+  // Load session info periodically
+  useEffect(() => {
+    if (!sessionId) return;
+    
+    const interval = setInterval(async () => {
+      try {
+        const info = await getChatSessionInfo(sessionId);
+        setSessionInfo(info);
+      } catch (err) {
+        // Session might be expired
+        console.error('Failed to fetch session info:', err);
+      }
+    }, 10000); // Every 10 seconds
 
-    const res = await fetch(`${API}/api/ask`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
-    });
+    return () => clearInterval(interval);
+  }, [sessionId]);
 
-    if (!res.ok) {
-      const t = await res.text().catch(() => "");
-      throw new Error(`API ${res.status}: ${t}`);
-    }
-
-    return await res.json();  // { answer, citations }
-  }
-
-  // ============================================================
-  // SEND USER MESSAGE
-  // ============================================================
-  async function sendMessage() {
-    if (busy) return;
-    const text = input.trim();
-    if (!text) return;
-
-    setInput("");
-    setMessages(m => [...m, { role: "user", content: text }]);
-    setMessages(m => [...m, { role: "assistant", content: "Thinking…", cites: [] }]);
-    setBusy(true);
+  async function initializeChat() {
+    setIsLoading(true);
+    setError(null);
 
     try {
-      const { answer, citations } = await askOnce({ text, top_k: 5 });
+      // Check for existing session in localStorage
+      const savedSessionId = localStorage.getItem('chatSessionId');
+      
+      if (savedSessionId) {
+        // Try to validate and load existing session
+        try {
+          const info = await getChatSessionInfo(savedSessionId);
+          
+          if (info.is_active) {
+            // Session is valid, load history
+            setSessionId(savedSessionId);
+            setSessionInfo(info);
+            
+            const history = await getChatHistory(savedSessionId);
+            setMessages(history.messages);
+            setIsLoading(false);
+            return;
+          }
+        } catch (err) {
+          // Session not found or invalid, start new
+          localStorage.removeItem('chatSessionId');
+        }
+      }
 
-      setMessages(m => {
-        const copy = [...m];
-        copy[copy.length - 1] = {
-          role: "assistant",
-          content: answer,
-          cites: citations
-        };
-        return copy;
+      // Start new session
+      await startNewSession();
+    } catch (err) {
+      setError(err.message || 'Failed to initialize chat');
+      setIsLoading(false);
+    }
+  }
+
+  async function startNewSession() {
+    try {
+      const response = await startChatSession({ user_name: 'Student' });
+      
+      setSessionId(response.session_id);
+      localStorage.setItem('chatSessionId', response.session_id);
+      
+      setMessages([{
+        role: 'assistant',
+        content: response.greeting,
+        created_at: response.started_at,
+      }]);
+
+      // Fetch session info
+      const info = await getChatSessionInfo(response.session_id);
+      setSessionInfo(info);
+      
+      setIsLoading(false);
+    } catch (err) {
+      throw new Error(err.message || 'Failed to start chat session');
+    }
+  }
+
+  async function handleSendMessage() {
+    if (!inputText.trim() || isStreaming || !sessionId) return;
+
+    const userMessage = inputText.trim();
+    setInputText('');
+    setError(null);
+
+    // Add user message
+    const userMsg = {
+      role: 'user',
+      content: userMessage,
+      created_at: new Date().toISOString(),
+    };
+    setMessages(prev => [...prev, userMsg]);
+
+    // Check message limit
+    if (sessionInfo && sessionInfo.message_count >= 49) {
+      setError('You have reached the 50 message limit for this session. Please start a new chat.');
+      return;
+    }
+
+    setIsStreaming(true);
+    setCurrentResponse('');
+    tokenBufferRef.current = '';
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/chat/message`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session_id: sessionId,
+          message: userMessage,
+        }),
       });
-    } catch (e) {
-      setMessages(m => {
-        const copy = [...m];
-        copy[copy.length - 1] = {
-          role: "assistant",
-          content: `⚠️ Error: ${e.message}`,
-          cites: []
-        };
-        return copy;
-      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to send message');
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let fullResponse = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n\n');
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const data = JSON.parse(line.substring(6));
+
+              if (data.type === 'token') {
+                fullResponse += data.content;
+                bufferToken(data.content);
+              } else if (data.type === 'done') {
+                // Flush any remaining buffered tokens
+                flushTokenBuffer();
+                
+                // Add complete message
+                const assistantMsg = {
+                  role: 'assistant',
+                  content: fullResponse,
+                  created_at: new Date().toISOString(),
+                  tokens_used: data.tokens_used,
+                };
+                setMessages(prev => [...prev, assistantMsg]);
+                setCurrentResponse('');
+                
+                // Update session info
+                if (sessionInfo) {
+                  setSessionInfo({
+                    ...sessionInfo,
+                    message_count: sessionInfo.message_count + 2, // user + assistant
+                  });
+                }
+              } else if (data.type === 'error') {
+                throw new Error(data.message);
+              }
+            } catch (parseError) {
+              console.error('Failed to parse SSE data:', parseError);
+            }
+          }
+        }
+      }
+    } catch (err) {
+      setError(err.message || 'Failed to send message');
+      setCurrentResponse('');
+      
+      // Add error message
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: `⚠️ Error: ${err.message}`,
+        created_at: new Date().toISOString(),
+      }]);
     } finally {
-      setBusy(false);
+      setIsStreaming(false);
     }
   }
 
-  function onKeyDown(e) {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      if (!busy) sendMessage();
+  function bufferToken(token) {
+    tokenBufferRef.current += token;
+    
+    clearTimeout(bufferTimeoutRef.current);
+    bufferTimeoutRef.current = setTimeout(() => {
+      flushTokenBuffer();
+    }, 30); // Update UI every 30ms
+  }
+
+  function flushTokenBuffer() {
+    if (tokenBufferRef.current) {
+      setCurrentResponse(prev => prev + tokenBufferRef.current);
+      tokenBufferRef.current = '';
     }
   }
 
-  // Chat actions
-  function clearChat() {
-    setMessages([{ role: "assistant", content: "Chat cleared. Ask away!", cites: [] }]);
+  async function handleNewChat() {
+    if (isStreaming) return;
+    
+    const confirmed = confirm('Start a new conversation? Current chat will be saved.');
+    if (!confirmed) return;
+
+    setIsLoading(true);
+    await startNewSession();
   }
 
-  function resetStore() {
-    toast("Reset is not available on this backend.");
+  async function handleEndChat() {
+    if (isStreaming) return;
+    
+    const confirmed = confirm('End this chat session?');
+    if (!confirmed) return;
+
+    try {
+      if (sessionId) {
+        await endChatSession(sessionId);
+        localStorage.removeItem('chatSessionId');
+      }
+      setSessionId(null);
+      setMessages([]);
+      setSessionInfo(null);
+      await startNewSession();
+    } catch (err) {
+      setError('Failed to end session');
+    }
   }
 
-  // ============================================================
-  // UI
-  // ============================================================
+  if (isLoading) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.loading}>
+          <Loader2 size={48} className={styles.spinner} />
+          <p>Initializing chat session...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div style={{ minHeight: "100vh", background: "#0b1220", padding: "3rem 1.5rem" }}>
-      <div style={{ maxWidth: "60rem", margin: "0 auto" }}>
+    <div className={styles.container}>
+      <div className={styles.content}>
+        <ChatHeader
+          messageCount={sessionInfo?.message_count || 0}
+          onNewChat={handleNewChat}
+          onEndChat={handleEndChat}
+        />
 
-        {/* Title */}
-        <h1
-          style={{
-            fontSize: "2rem",
-            fontWeight: "bold",
-            textAlign: "center",
-            marginBottom: "0.5rem",
-            background: "linear-gradient(135deg,#00d9ff,#7c5cff)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-          }}
-        >
-          AI Tutor
-        </h1>
-        <p style={{ textAlign: "center", color: "#94a3b8", marginBottom: "1.5rem" }}>
-          Chat • Answers from your slides
-        </p>
-
-        {/* Main Card */}
-        <section
-          style={{
-            background: "#111a2b",
-            padding: "2rem",
-            borderRadius: "1rem",
-            border: "1px solid #20304d",
-          }}
-        >
-          {/* Toolbar */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "0.75rem 1rem",
-              border: "1px solid #20304d",
-              borderRadius: "0.875rem",
-              background: "#0b1220",
-              marginBottom: "1rem",
-            }}
-          >
-  
-
-            <div style={{ display: "flex", gap: 12 }}>
-              <button onClick={clearChat} style={btnSmall}>Clear Chat</button>
-              <button onClick={resetStore} style={btnSmall}>Reset Store</button>
-            </div>
-          </div>
-
-          {/* Chat window */}
-          <div style={{ height: "56vh", overflowY: "auto", padding: 12 }}>
-            {messages.map((m, i) => (
-              <div
-                key={i}
-                style={{
-                  display: "flex",
-                  justifyContent: m.role === "user" ? "flex-end" : "flex-start",
-                  margin: "12px 0"
-                }}
-              >
-                <div
-                  style={{
-                    maxWidth: "70ch",
-                    border: "1px solid #20304d",
-                    background: "#0b1220",
-                    color: "#e6eefc",
-                    padding: "10px 12px",
-                    borderRadius: 14,
-                    whiteSpace: "pre-wrap"
-                  }}
-                >
-                  {m.content}
-                  {m.cites?.length > 0 && (
-                    <ul style={{ marginTop: 8, paddingLeft: 18, fontSize: 13, color: "#93a3bd" }}>
-                      {m.cites.map((c, j) => <li key={j}>{c}</li>)}
-                    </ul>
-                  )}
-                </div>
-              </div>
-            ))}
-            <div ref={endRef} />
-          </div>
-
-          {/* Input */}
-          <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
-            <textarea
-              placeholder='Type a question… e.g., "TLS handshake (slide 12)"'
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={onKeyDown}
-              disabled={busy}
-              rows={3}
-              style={{
-                flex: 1,
-                minHeight: 76,
-                maxHeight: 220,
-                resize: "vertical",
-                borderRadius: 12,
-                border: "1px solid #20304d",
-                background: "#0b1220",
-                color: "#e6eefc",
-                padding: "10px 12px",
-              }}
-            />
-            <button
-              onClick={sendMessage}
-              disabled={busy || !input.trim()}
-              style={btnSend(busy)}
-            >
-              {busy ? "Working…" : "Send"}
+        {error && (
+          <div className={styles.errorBanner}>
+            <AlertCircle size={20} />
+            <span>{error}</span>
+            <button onClick={() => setError(null)} className={styles.errorClose}>
+              ×
             </button>
           </div>
+        )}
 
-          {status && (
-            <p style={{ textAlign: "center", marginTop: 8, color: "#00d9ff" }}>{status}</p>
-          )}
-        </section>
+        <div className={styles.messagesContainer}>
+          <div className={styles.messages}>
+            {messages.map((msg, index) => (
+              <ChatMessage
+                key={index}
+                role={msg.role}
+                content={msg.content}
+                timestamp={msg.created_at}
+              />
+            ))}
+
+            {currentResponse && (
+              <ChatMessage
+                role="assistant"
+                content={currentResponse}
+                isStreaming={true}
+              />
+            )}
+
+            <div ref={messagesEndRef} />
+          </div>
+        </div>
+
+        <div className={styles.inputContainer}>
+          <ChatInput
+            value={inputText}
+            onChange={setInputText}
+            onSubmit={handleSendMessage}
+            disabled={isStreaming || (sessionInfo?.message_count >= 50)}
+            maxLength={500}
+          />
+        </div>
       </div>
     </div>
   );
 }
-
-// ---------------- BUTTON STYLES ----------------
-const btnSmall = {
-  background: "transparent",
-  color: "#cfe3ff",
-  border: "1px solid #2b3b5a",
-  borderRadius: 24,
-  padding: "8px 14px",
-  cursor: "pointer"
-};
-
-const btnSend = (busy) => ({
-  border: "none",
-  borderRadius: 12,
-  padding: "12px 18px",
-  background: "linear-gradient(135deg,#00d9ff,#7c5cff)",
-  color: "#08111f",
-  fontWeight: 700,
-  cursor: busy ? "not-allowed" : "pointer",
-  opacity: busy ? 0.6 : 1,
-});

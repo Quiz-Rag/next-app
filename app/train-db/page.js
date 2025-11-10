@@ -13,6 +13,13 @@ export default function TrainDBPage() {
 
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files || []);
+    
+    // Validate file count (1-30)
+    if (selectedFiles.length > 30) {
+      setError("Maximum 30 files allowed per batch. Please select fewer files.");
+      return;
+    }
+    
     setFiles(selectedFiles);
     setError(null);
   };
@@ -174,6 +181,13 @@ export default function TrainDBPage() {
                 e.currentTarget.style.borderColor = 'var(--border-color)';
                 e.currentTarget.style.background = 'var(--bg-dark)';
                 const droppedFiles = Array.from(e.dataTransfer.files);
+                
+                // Validate file count (1-30)
+                if (droppedFiles.length > 30) {
+                  setError("Maximum 30 files allowed per batch. Please select fewer files.");
+                  return;
+                }
+                
                 setFiles(droppedFiles);
                 setError(null);
               }}>
@@ -199,7 +213,7 @@ export default function TrainDBPage() {
                   {files.length > 0 ? `${files.length} file(s) selected` : 'Drop your files here or click to browse'}
                 </p>
                 <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                  Upload 1-10 files • PDF or PPTX • Max 50MB per file
+                  Upload 1-30 files • PDF or PPTX • Max 50MB per file
                 </p>
               </div>
             </div>
@@ -219,7 +233,7 @@ export default function TrainDBPage() {
                   marginBottom: '0.75rem',
                   color: 'var(--text-primary)'
                 }}>
-                  Selected Files ({files.length}/10):
+                  Selected Files ({files.length}/30):
                 </p>
                 <div style={{ display: 'grid', gap: '0.5rem' }}>
                   {files.map((file, idx) => (

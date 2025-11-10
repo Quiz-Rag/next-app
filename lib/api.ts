@@ -132,8 +132,8 @@ export async function uploadDocumentBatch(
     throw new Error('Minimum 2 files required for batch upload');
   }
 
-  if (files.length > 10) {
-    throw new Error('Maximum 10 files allowed per batch');
+  if (files.length > 30) {
+    throw new Error('Maximum 30 files allowed per batch');
   }
 
   const formData = new FormData();
@@ -538,4 +538,112 @@ export async function getQuizAnalytics(quizId: number): Promise<QuizAnalytics> {
   }
 
   return response.json();
+}
+
+// ============= Chat Tutor API Functions =============
+
+export interface ChatStartRequest {
+  user_id?: string;
+  user_name?: string;
+}
+
+export interface ChatStartResponse {
+  session_id: string;
+  greeting: string;
+  started_at: string;
+}
+
+export interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+  created_at: string;
+  tokens_used?: number;
+}
+
+export interface ChatHistoryResponse {
+  session_id: string;
+  messages: ChatMessage[];
+  message_count: number;
+  started_at: string;
+  last_message_at: string;
+}
+
+export interface ChatSessionInfo {
+  session_id: string;
+  user_id?: string;
+  user_name?: string;
+  message_count: number;
+  started_at: string;
+  last_message_at: string;
+  is_active: boolean;
+}
+
+/**
+ * Start a new chat session
+ * @param request - Optional user info
+ * @returns Promise with session ID and greeting
+ */
+export async function startChatSession(request: ChatStartRequest = {}): Promise<ChatStartResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/chat/start`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(request),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ detail: 'Failed to start chat session' }));
+    throw new Error(error.detail || 'Failed to start chat session');
+  }
+
+  return response.json();
+}
+
+/**
+ * Get chat session history
+ * @param sessionId - Session UUID
+ * @returns Promise with chat history
+ */
+export async function getChatHistory(sessionId: string): Promise<ChatHistoryResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/chat/${sessionId}/history`);
+
+  if (!response.ok) {
+    if (response.status === 404) {
+      throw new Error('Session not found');
+    }
+    throw new Error('Failed to fetch chat history');
+  }
+
+  return response.json();
+}
+
+/**
+ * Get chat session info
+ * @param sessionId - Session UUID
+ * @returns Promise with session info
+ */
+export async function getChatSessionInfo(sessionId: string): Promise<ChatSessionInfo> {
+  const response = await fetch(`${API_BASE_URL}/api/chat/${sessionId}/info`);
+
+  if (!response.ok) {
+    if (response.status === 404) {
+      throw new Error('Session not found');
+    }
+    throw new Error('Failed to fetch session info');
+  }
+
+  return response.json();
+}
+
+/**
+ * End chat session
+ * @param sessionId - Session UUID
+ */
+export async function endChatSession(sessionId: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/api/chat/${sessionId}`, {
+    method: 'DELETE',
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to end chat session');
+  }
 }
