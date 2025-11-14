@@ -1,9 +1,8 @@
 "use client";
 
-import React from 'react';
-import { User, Bot, Copy, Check } from 'lucide-react';
-import styles from './ChatMessage.module.css';
-import { useState } from 'react';
+import React, { useState } from "react";
+import { User, Bot, Copy, Check } from "lucide-react";
+import styles from "./ChatMessage.module.css";
 
 export default function ChatMessage({ role, content, timestamp, isStreaming = false }) {
   const [copied, setCopied] = useState(false);
@@ -15,45 +14,51 @@ export default function ChatMessage({ role, content, timestamp, isStreaming = fa
   };
 
   const formatTime = (isoString) => {
-    if (!isoString) return '';
+    if (!isoString) return "";
     const date = new Date(isoString);
-    return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    return date.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   return (
-    <div className={`${styles.messageWrapper} ${role === 'user' ? styles.userMessage : styles.assistantMessage}`}>
+    <div
+      className={`${styles.messageWrapper} ${
+        role === "user" ? styles.userMessage : styles.assistantMessage
+      }`}
+    >
       <div className={styles.messageContainer}>
         <div className={styles.avatar}>
-          {role === 'user' ? <User size={20} /> : <Bot size={20} />}
+          {role === "user" ? <User size={20} /> : <Bot size={20} />}
         </div>
-        
+
         <div className={styles.messageContent}>
           <div className={styles.messageHeader}>
             <span className={styles.roleName}>
-              {role === 'user' ? 'You' : 'AI Tutor'}
+              {role === "user" ? "You" : "AI Tutor"}
             </span>
             {timestamp && (
-              <span className={styles.timestamp}>
-                {formatTime(timestamp)}
-              </span>
+              <span className={styles.timestamp}>{formatTime(timestamp)}</span>
             )}
           </div>
-          
+
+          {/*  FIXED: Newlines will now show properly */}
           <div className={styles.messageBubble}>
-            <p className={styles.messageText}>
+            <p className={styles.messageText} style={{ whiteSpace: "pre-wrap" }}>
               {content}
               {isStreaming && <span className={styles.cursor}>▋</span>}
             </p>
           </div>
 
-          {role === 'assistant' && !isStreaming && content && (
+          {role === "assistant" && !isStreaming && content && (
             <button
               onClick={handleCopy}
               className={styles.copyButton}
               title="Copy message"
             >
               {copied ? <Check size={14} /> : <Copy size={14} />}
-              <span>{copied ? 'Copied!' : 'Copy'}</span>
+              <span>{copied ? "Copied!" : "Copy"}</span>
             </button>
           )}
         </div>
